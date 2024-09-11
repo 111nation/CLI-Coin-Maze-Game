@@ -12,7 +12,7 @@ Map::Map(int x, int y) {
 		ycurs = -1;
 		xcurs = -1; 
 		
-		ArrInit();
+		MapGen(); // Generates map
 		DrawNew();
 
 		// Initiializes curser properties
@@ -35,15 +35,39 @@ Map::~Map () {
 //=======================
 // ARRAY INITIALIZATION
 //=======================
-void Map::ArrInit(){
+bool Map::CoinGen() {
+	
+	srand(time(0));
 
-    // Sets amount of coloumns for array
-    for (int i = 0; i < height+2;i++) {
-        arrMap[i] = new int[width+2];
-    }
+	for (int y = 1; y < height+1; y++) {
+		for (int x=1; x < width+1; x++) {
+			if ((x-1 == 0) && (y-1 == 0)) continue; // Skip player position
+			
+			int placeCoin = rand() % 2;	
+			// Randomly places coins		
+			if ((placeCoin == 1) && (coinsLeft < coins)) {
+				coinsLeft++;
+				arrMap[y][x] = COIN;
+			}
 
-    // Puts walls around Array
-    // Empty space aswell
+			if (coinsLeft == coins) return true; // If all coins generated we exit
+		}
+	}
+
+	return false; // Not all coins where generated
+}
+
+void Map::MapGen(){
+	
+	arrMap = new int*[height + 2]; 
+
+    	// Sets amount of coloumns for array
+    	for (int i = 0; i < height+2;i++) {
+        	arrMap[i] = new int[width+2];
+    	}
+
+    	// Puts walls around Array
+    	// Empty space aswell
 	for (int y = 0; y < height+2; y++) {
 		arrMap[y][0] = WALL;
 			
@@ -58,9 +82,17 @@ void Map::ArrInit(){
 
 	    arrMap[y][width+1] = WALL;
 	}
+	
+	// Generates coins
+	coins = (int)((height * width) * 0.6) / 1;
+	coinsLeft = 0;
+
+	while(!CoinGen()); // Ensures all coins generated
 
 	// Place player
 	arrMap[Player.y + 1][Player.x + 1]=PLAYER;
+	ycurs = 0;
+	xcurs = 0;
 
 }
 
@@ -161,6 +193,9 @@ wchar_t Map::getChar(int y, int x) {
 			return cplayer;
 		case SPACE:
 			return space;
+
+		case COIN:
+			return coin;
 
 		case WALL:
 

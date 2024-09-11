@@ -1,6 +1,8 @@
 #pragma once 
 
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
@@ -31,30 +33,34 @@ class Player {
 
 class Map { 
 	private:
-    //=======================
+    	//=======================
 	// MAP DETAILS
-    //=======================
-    // DIMENSIONS
+    	//=======================
+    	// DIMENSIONS
 	int width, height; 
-    int** arrMap = new int*[height+2];
+    	int** arrMap;
+	// COINS
+	int coins = 0; // number of coins to collect 
+	int coinsLeft = 0; // number of coins left
 
 
-    //=======================
-    // MAP DISPLAY
-    //=======================
+    	//=======================
+    	// MAP DISPLAY
+    	//=======================
 	const wchar_t vwall = L'█';
-    const wchar_t hwall = L'-';	
-	const wchar_t space = L'0';
+    	const wchar_t hwall = L'-';	
+	const wchar_t space = L' ';
+	const wchar_t coin = L'C';
 	
-    //=======================
+    	//=======================
 	//PLAYER
-    //=======================
+    	//=======================
 	Player Player;
 	const wchar_t cplayer = L'V';
 
-    //=======================
-    // CURSER DETAILS
-    //=======================
+    	//=======================
+    	// CURSER DETAILS
+    	//=======================
 	// CURSER POSITION
 	int ycurs, xcurs;
 
@@ -65,35 +71,36 @@ class Map {
 	public:
     
 	Map(int x, int y);
-    ~Map();
+    	~Map();
 	
-    //=======================
-    // ARRAY INITIALIZATION
-    //=======================
-    void ArrInit();
+    	//=======================
+    	// ARRAY INITIALIZATION
+    	//=======================
+    	bool CoinGen(); // Return true if all coins generated
+	void MapGen();
 
-    //=======================
+    	//=======================
 	// CURSER CONTROLS
-    //=======================
-    void CursReturn();
-    void cursTop();
-    void cursBottom();
-    void CursPlayer();
-    void MovCurs(int x, int y); // Custom moving
+    	//=======================
+    	void CursReturn();
+    	void cursTop();
+    	void cursBottom();
+    	void CursPlayer();
+	void MovCurs(int x, int y); // Custom moving
 
-    // UTILITY
+    	// UTILITY
 	void hideCurs();
 	void showCurs();
 
-    //=======================
+    	//=======================
 	// UPDATING SCREEN
-    //=======================
+    	//=======================
 	void DrawNew();
 	wchar_t getChar(int y, int x);
 
-    //=======================
+    	//=======================
 	// PLAYER MOVEMENT
-    //=======================
+    	//=======================
 	void Move(int x, int y);
 
 };
