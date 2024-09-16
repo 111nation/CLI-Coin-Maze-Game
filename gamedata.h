@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <cmath>
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
@@ -96,11 +97,15 @@ class Map {
 	// UPDATING SCREEN
     	//=======================
 	void DrawNew();
-	wchar_t getChar(int y, int x);
-
-    	//=======================
+    	
+	//=======================
 	// PLAYER MOVEMENT
     	//=======================
 	void Move(int x, int y);
 
+	//=======================
+	// UTILITIES
+	//=======================
+	wchar_t getChar(int y, int x);
+	int getObject(int y, int x);
 };

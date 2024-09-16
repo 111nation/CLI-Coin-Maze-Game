@@ -35,17 +35,50 @@ Map::~Map () {
 //=======================
 // ARRAY INITIALIZATION
 //=======================
+int Map::getObject(int y, int x) {
+	// -1 is out of bounds
+	if ( (y < 0) || (y > height+1)) return -1;
+	if ( (x < 0) || (x > width+1)) return -1;
+
+	return arrMap[y][x];			
+
+}
+
 bool Map::CoinGen() {
 	
 	srand(time(0));
-
+	
 	for (int y = 1; y < height+1; y++) {
 		for (int x=1; x < width+1; x++) {
 			if ((x-1 == 0) && (y-1 == 0)) continue; // Skip player position
 			
-			int placeCoin = rand() % 2;	
+			//=====================================
+			// CHECKS SURROUNDING COINS
+			//=====================================
+			int surrounding_coins = 0;
+			// Counts surrounding coins
+			for (int sy=-3; sy<=3; sy++) {
+				for (int sx=-3; sx<=3; sx++){
+					if (sx == 0 && sy == 0) continue; // skips area which we asses
+					
+					int object = getObject(y+sy, x+sx);
+					if (object == COIN) {
+						++surrounding_coins;
+					}
+
+				}
+			}	
+
+			// Calculates probability of coin placed based on surrounding coins
+			int probability = (int)(pow(2, (surrounding_coins+1))+10);
+			probability = rand() % probability;
+			// Ensures coin generation not too rare
+			if (probability > 200) {
+				probability = 200;
+			}	
+
 			// Randomly places coins		
-			if ((placeCoin == 1) && (coinsLeft < coins)) {
+			if (probability == 1) {
 				coinsLeft++;
 				arrMap[y][x] = COIN;
 			}
@@ -84,7 +117,7 @@ void Map::MapGen(){
 	}
 	
 	// Generates coins
-	coins = (int)((height * width) * 0.6) / 1;
+	coins = 20;
 	coinsLeft = 0;
 
 	while(!CoinGen()); // Ensures all coins generated
