@@ -20,7 +20,7 @@ Map::Map(int x, int y) {
 				throw "Cursor failure";
 		}
 
-		hideCurs();	
+		//hideCurs();	
 }
 
 Map::~Map () {
@@ -51,7 +51,8 @@ bool Map::CoinGen() {
 	for (int y = 1; y < height+1; y++) {
 		for (int x=1; x < width+1; x++) {
 			if ((x-1 == 0) && (y-1 == 0)) continue; // Skip player position
-			
+			if (arrMap[y][x] == COIN) continue; // Skip if coin already placed
+
 			//=====================================
 			// CHECKS SURROUNDING COINS
 			//=====================================
@@ -70,16 +71,18 @@ bool Map::CoinGen() {
 			}	
 
 			// Calculates probability of coin placed based on surrounding coins
-			int probability = (int)(pow(2, (surrounding_coins+1))+10);
+			//int probability = (int)(pow(2, (surrounding_coins+1))+10);
+			int probability = surrounding_coins+11;
 			probability = rand() % probability;
 			// Ensures coin generation not too rare
 			if (probability > 200) {
-				probability = 200;
+				probability = (rand() % 201);
 			}	
 
 			// Randomly places coins		
 			if (probability == 1) {
-				coinsLeft++;
+				++coinsLeft;
+				--spaceLeft;
 				arrMap[y][x] = COIN;
 			}
 
@@ -91,6 +94,13 @@ bool Map::CoinGen() {
 }
 
 void Map::MapGen(){
+
+	//============================
+	// INITIALIZE
+	//============================
+	coinsLeft = 0;
+	coins = 0;
+	spaceLeft = 0;
 	
 	arrMap = new int*[height + 2]; 
 
@@ -108,25 +118,30 @@ void Map::MapGen(){
 			// Handles last row of walls
 			if ((y == height+1)||(y==0)) { // TOP ROW
 				arrMap[y][x] = WALL;
-			} else { 
+			} else {
              		   arrMap[y][x] = SPACE;
+			   ++spaceLeft;
            		}
 		}
 
 	    arrMap[y][width+1] = WALL;
 	}
-	
-	// Generates coins
-	coins = 20;
-	coinsLeft = 0;
-
-	while(!CoinGen()); // Ensures all coins generated
 
 	// Place player
 	arrMap[Player.y + 1][Player.x + 1]=PLAYER;
 	ycurs = 0;
 	xcurs = 0;
 
+	// PLACING PLAYER DECREASES SPACE
+	--spaceLeft;
+
+	// Generates coins
+	if (spaceLeft == 0) throw "Map has no space for coins";
+	coins = (int)(spaceLeft*0.3);
+
+	coinsLeft = 0;
+
+	while(!CoinGen()); // Ensures all coins generated
 }
 
 //=======================
@@ -144,9 +159,9 @@ void Map::CursPlayer() {
 		// Returns curser to player
 	
 		std::cout << '\r' << ESC << ycurs+1 << UP;
-		std::cout << ESC << Player.y << DOWN;
+		std::cout << ESC << Player.y+1 << DOWN;
 
-		std::cout << ESC << Player.x << RIGHT;
+		std::cout << ESC << Player.x+1 << RIGHT;
 
 		xcurs = Player.x;
 		ycurs = Player.y;
@@ -169,14 +184,15 @@ void Map::showCurs() {
 
 }
 
-void Map::cursBottom() {
-	std::cout << ESC << height + 3 << DOWN;
-		ycurs = height + 2;
+void Map::CursBottom() {
+	CursTop();
+	std::cout << ESC << height + 2 << DOWN;
+	ycurs = height + 1;
 }
 
-void Map::cursTop() {
-		std::cout << ESC << ycurs + 1 << UP;
-		ycurs = -1;
+void Map::CursTop() {
+	std::cout << ESC << ycurs + 1 << UP;
+	ycurs = -1;
 }
 
 void Map::MovCurs(int x, int y) {
@@ -197,13 +213,12 @@ void Map::MovCurs(int x, int y) {
 				std::cout << ESC << -x << LEFT;
 			}
 		}
-
+		
 }
 
 //=======================	
 // UPDATING SCREEN
 //=======================
-
 void Map::DrawNew() {
 		CursReturn();
 		
@@ -215,6 +230,56 @@ void Map::DrawNew() {
 		}	
 
 		CursPlayer();
+}
+
+void Map::Message(std::string msg) { 
+		// CURSER PLACEMENT
+		int oldy = ycurs;
+		int oldx = xcurs;
+		
+
+		//==========================
+		// MESSAGE HANDLING
+		//==========================
+		// COUNTS MESSAGE LINES
+		int newMsg_lines = 0;
+		for (unsigned int i = 0; i < msg.length(); i++) {
+			if (msg[i] == '\n') {
+				++newMsg_lines;
+			}
+		}
+		
+		CursBottom();
+
+		// CLEARS PREV MESSAGE
+		if (msg_lines > 0) {
+			std::cout << '\r';
+
+			MovCurs(0,msg_lines);
+			for (int i = msg_lines; i > 0; i--) {
+				std::cout << ESC << "2K";
+			}		
+			MovCurs(0,-msg_lines); 	
+		}
+		
+		// DISPLAY MESSAGE
+		msg_lines = newMsg_lines;
+		std::cout << '\r'<< msg;
+
+		//==========================
+		// CURSER HANDLING
+		//==========================
+		// UPDATES CURSER POS
+		std::cout << '\r';
+		xcurs = -1;
+		ycurs = ((height + 2) + msg_lines) - 1;
+		
+		// BACK TO TOP
+		CursTop(); 
+		
+		MovCurs(oldx+1, oldy+1);
+		ycurs = oldy;
+		xcurs = oldx;
 }
 
 wchar_t Map::getChar(int y, int x) {
@@ -243,7 +308,6 @@ wchar_t Map::getChar(int y, int x) {
 //=======================
 // PLAYER MOVEMENT
 //=======================
-
 void Map::Move(int x, int y) {
 		
 		// if move out of bounds of array, move not considered
@@ -256,14 +320,14 @@ void Map::Move(int x, int y) {
 		bool moved = false;
 		
 		// Checks what object player landed on
-		switch (arrMap[newy + 1][newx + 1]) {
+		int objLanded = arrMap[newy + 1][newx + 1];
+		switch (objLanded) {
 			case SPACE:
 				arrMap[newy + 1][newx + 1] = PLAYER;
 				moved = true;
 				break;
 			case COIN:
 				arrMap[newy + 1][newx + 1] = PLAYER;
-				//pickCoin();
 				moved = true;
 				break;
 			case WALL:
@@ -286,6 +350,19 @@ void Map::Move(int x, int y) {
 			// Update curser
 			ycurs = Player.y;
 			xcurs = Player.x;
-
+			
+			// Determins what to do when user lands on certain object
+			switch (objLanded) {
+				case COIN:
+					pickCoin();
+					break;
+			}
 		}
+
+}
+
+void Map::pickCoin() {
+	--coinsLeft;
+	
+	Message("Coins: " + std::to_string(coins) + "\nCoins Left: " + std::to_string(coinsLeft));
 }

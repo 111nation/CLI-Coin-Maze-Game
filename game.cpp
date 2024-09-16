@@ -12,11 +12,11 @@ int main () {
 	// Initializes MAP
 	Map *map=nullptr;
 	try {
-		map = new Map(25, 10);
+		map = new Map(25,10);
 		
 		if (!gameLoop(*map)){
 			// User quits game
-			map->cursBottom();
+			map->CursBottom();
 			map->showCurs();
 			return 0;
 		}

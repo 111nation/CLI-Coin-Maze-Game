@@ -43,6 +43,8 @@ class Map {
 	// COINS
 	int coins = 0; // number of coins to collect 
 	int coinsLeft = 0; // number of coins left
+	//SPACES
+	int spaceLeft = 0;
 
 
     	//=======================
@@ -84,8 +86,8 @@ class Map {
 	// CURSER CONTROLS
     	//=======================
     	void CursReturn();
-    	void cursTop();
-    	void cursBottom();
+    	void CursTop();
+    	void CursBottom();
     	void CursPlayer();
 	void MovCurs(int x, int y); // Custom moving
 
@@ -97,11 +99,17 @@ class Map {
 	// UPDATING SCREEN
     	//=======================
 	void DrawNew();
+	
+	// MESSAGE (BOTTOM)
+	int msg_lines = 0;
+	void Message(std::string msg);
+	void ClearMessage();
     	
 	//=======================
 	// PLAYER MOVEMENT
     	//=======================
 	void Move(int x, int y);
+	void pickCoin();
 
 	//=======================
 	// UTILITIES
