@@ -18,10 +18,11 @@
 //=======================
 // ARRAY MAP DATA
 //=======================
-#define WALL 0
-#define PLAYER 1
-#define COIN 2
-#define SPACE 3
+#define VWALL 0
+#define HWALL 1
+#define PLAYER 2
+#define COIN 3
+#define SPACE 4
 
 class Player {
 	public: 
@@ -45,6 +46,7 @@ class Map {
 	int coinsLeft = 0; // number of coins left
 	//SPACES
 	int spaceLeft = 0;
+	int amtRooms = 0;
 
 
     	//=======================
@@ -79,6 +81,7 @@ class Map {
     	//=======================
     	// ARRAY INITIALIZATION
     	//=======================
+	bool RoomGen();
     	bool CoinGen(); // Return true if all coins generated
 	void MapGen();
 

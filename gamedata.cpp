@@ -20,7 +20,7 @@ Map::Map(int x, int y) {
 				throw "Cursor failure";
 		}
 
-		//hideCurs();	
+		hideCurs();	
 }
 
 Map::~Map () {
@@ -43,6 +43,83 @@ int Map::getObject(int y, int x) {
 	return arrMap[y][x];			
 
 }
+
+bool Map::RoomGen() {
+	srand(time(0));
+	// ROOM DATA
+	//int amtRooms = rand() % (int)(0.16 * (width * height) + 1);
+	struct struct_room { 
+		int width;
+		int height;
+		int area;
+	};
+
+	for (int y = 0; y < height+1; y++) {
+		for (int x=0; x < width+1; x++) {
+			if ((x-1 == 0) && (y-1 == 0)) continue; // Skip player position
+			// DATA OF HYPOTHETICAL ROOM
+			struct_room Room = {};
+			Room.width = (rand() % 10 ) + 1;
+			Message(std::to_string(Room.width));
+			Room.height = (rand() % 10 ) + 1;
+			Room.area = Room.width * Room.height;
+
+			//=====================================
+			//	CHECK IF ROOM WILL FIT
+			//=====================================
+			// BOTTOM
+			if (Room.height + y >= height+1) { 
+				continue; 
+			}
+			// RIGHT
+			if (Room.width + x >= width+1) { 
+				continue; 
+			}
+			
+			--amtRooms;
+
+			std::string msg = "Position: " + std::to_string(x-1) + ";" + std::to_string(y-1);
+			msg += "\nWidth: " +  std::to_string(Room.width);
+			msg += "\nHeight: " + std::to_string(Room.height);
+			Message(msg);
+
+
+			// ROOM FITS
+			for (int sy = y; sy < height+1; sy++) {
+				// Doesnt overwrite existing walls of map
+				if (!((arrMap[y][x] != VWALL) && (arrMap[y][x] != HWALL))) {
+					arrMap[y][x] = VWALL;
+				}
+
+				for (int sx = x; sx < height+1; sx++) {
+					// INSIDE ROOM
+					if (!((arrMap[y][x] != VWALL) && (arrMap[y][x] != HWALL))) {
+						if (sy == y || sy == y + Room.height) {
+							arrMap[y][x] = HWALL;	
+						} else {
+							arrMap[y][x] = SPACE;
+						}
+					}	
+				}
+
+				// Doesnt overwrite existing walls of map
+				if (!((arrMap[y][x] != VWALL) && (arrMap[y][x] != HWALL))) {
+					arrMap[y][x] = VWALL;
+				}
+
+				if (amtRooms == 0) return true; // All rooms generated
+
+
+			}
+
+	
+		}
+
+	}
+
+	return false; // Rooms didnt finish generating	
+}
+
 
 bool Map::CoinGen() {
 	
@@ -112,19 +189,19 @@ void Map::MapGen(){
     	// Puts walls around Array
     	// Empty space aswell
 	for (int y = 0; y < height+2; y++) {
-		arrMap[y][0] = WALL;
+		arrMap[y][0] = VWALL;
 			
 		for (int x = 1; x < width+1; x++){
 			// Handles last row of walls
 			if ((y == height+1)||(y==0)) { // TOP ROW
-				arrMap[y][x] = WALL;
+				arrMap[y][x] = HWALL;
 			} else {
              		   arrMap[y][x] = SPACE;
 			   ++spaceLeft;
            		}
 		}
 
-	    arrMap[y][width+1] = WALL;
+	    arrMap[y][width+1] = VWALL;
 	}
 
 	// Place player
@@ -134,6 +211,10 @@ void Map::MapGen(){
 
 	// PLACING PLAYER DECREASES SPACE
 	--spaceLeft;
+	
+	// GENERATES ROOMS
+	amtRooms = 1;
+	while(!RoomGen());
 
 	// Generates coins
 	if (spaceLeft == 0) throw "Map has no space for coins";
@@ -295,10 +376,10 @@ wchar_t Map::getChar(int y, int x) {
 		case COIN:
 			return coin;
 
-		case WALL:
-
-			if ((x==0) || (x==width+1)) { return vwall; }
-			else { return hwall; }	
+		case HWALL:
+			return hwall;
+		case VWALL:
+			return vwall;
 
 		default: 
 			return space;
@@ -330,7 +411,9 @@ void Map::Move(int x, int y) {
 				arrMap[newy + 1][newx + 1] = PLAYER;
 				moved = true;
 				break;
-			case WALL:
+			case VWALL:
+				break;
+			case HWALL:
 				break;
 			default: 
 				break;
@@ -364,5 +447,5 @@ void Map::Move(int x, int y) {
 void Map::pickCoin() {
 	--coinsLeft;
 	
-	Message("Coins: " + std::to_string(coins) + "\nCoins Left: " + std::to_string(coinsLeft));
+	//Message("Coins: " + std::to_string(coins) + "\nCoins Left: " + std::to_string(coinsLeft));
 }
