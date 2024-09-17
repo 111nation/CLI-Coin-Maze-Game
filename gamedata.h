@@ -81,7 +81,12 @@ class Map {
     	//=======================
     	// ARRAY INITIALIZATION
     	//=======================
+	// ROOMS
+	bool isWall(int y, int x); 
+	void CreateRoom(int starty, int startx, int rwidth, int rheight);
 	bool RoomGen();
+	
+	// OTHER
     	bool CoinGen(); // Return true if all coins generated
 	void MapGen();
 

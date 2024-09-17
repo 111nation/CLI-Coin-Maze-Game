@@ -44,6 +44,36 @@ int Map::getObject(int y, int x) {
 
 }
 
+bool Map::isWall(int y, int x) {
+	return (arrMap[y][x] == VWALL) || (arrMap[y][x] == HWALL); 
+}
+
+void Map::CreateRoom(int starty, int startx, int rwidth, int rheight) {
+	for (int y = starty; y < height+1; y++) {
+
+		for (int x = startx; x < height+1; x++) {
+			// ENSURES WE DONT OVERWRITE WALLS
+			if (!isWall(y, x)) {
+				if (x == startx || x == startx + rwidth) {
+				
+					arrMap[y][x] = VWALL; // LEFT AND RIGHT WALLS
+				
+				} else if (y == starty || y == starty + rheight) {
+					arrMap[y][x] = HWALL; // TOP AND BOTTOM WALLS
+				
+				} else {
+				
+					arrMap[y][x] = SPACE; // REGULAR SPACE
+				
+				}	
+					
+			}
+
+		}
+	
+	}
+}
+
 bool Map::RoomGen() {
 	srand(time(0));
 	// ROOM DATA
@@ -76,42 +106,16 @@ bool Map::RoomGen() {
 				continue; 
 			}
 			
-			--amtRooms;
-
 			std::string msg = "Position: " + std::to_string(x-1) + ";" + std::to_string(y-1);
 			msg += "\nWidth: " +  std::to_string(Room.width);
 			msg += "\nHeight: " + std::to_string(Room.height);
 			Message(msg);
 
-
-			// ROOM FITS
-			for (int sy = y; sy < height+1; sy++) {
-				// Doesnt overwrite existing walls of map
-				if (!((arrMap[y][x] != VWALL) && (arrMap[y][x] != HWALL))) {
-					arrMap[y][x] = VWALL;
-				}
-
-				for (int sx = x; sx < height+1; sx++) {
-					// INSIDE ROOM
-					if (!((arrMap[y][x] != VWALL) && (arrMap[y][x] != HWALL))) {
-						if (sy == y || sy == y + Room.height) {
-							arrMap[y][x] = HWALL;	
-						} else {
-							arrMap[y][x] = SPACE;
-						}
-					}	
-				}
-
-				// Doesnt overwrite existing walls of map
-				if (!((arrMap[y][x] != VWALL) && (arrMap[y][x] != HWALL))) {
-					arrMap[y][x] = VWALL;
-				}
-
-				if (amtRooms == 0) return true; // All rooms generated
-
-
-			}
-
+			// CREATES ROOM
+			
+			CreateRoom(y, x, Room.width, Room.height);
+			--amtRooms;
+			if (amtRooms <= 0) return true;
 	
 		}
 
@@ -129,7 +133,8 @@ bool Map::CoinGen() {
 		for (int x=1; x < width+1; x++) {
 			if ((x-1 == 0) && (y-1 == 0)) continue; // Skip player position
 			if (arrMap[y][x] == COIN) continue; // Skip if coin already placed
-
+			if (arrMap[y][x] != SPACE) continue; // ENSURES ONLY SPACES ARE TAKEN
+			
 			//=====================================
 			// CHECKS SURROUNDING COINS
 			//=====================================
