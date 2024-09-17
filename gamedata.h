@@ -82,6 +82,7 @@ class Map {
     	// ARRAY INITIALIZATION
     	//=======================
 	// ROOMS
+	bool willRoomFit(int starty, int startx, int rwidth, int rheight);
 	bool isWall(int y, int x); 
 	void CreateRoom(int starty, int startx, int rwidth, int rheight);
 	bool RoomGen();

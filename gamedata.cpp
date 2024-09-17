@@ -44,14 +44,58 @@ int Map::getObject(int y, int x) {
 
 }
 
+bool Map::willRoomFit(int starty, int startx, int rwidth, int rheight) {
+	// ===CHECKS TO SEE WITHIN MAP BOUNDARY===
+	// BOTTOM
+	if (rheight + starty >= height+1) return false;
+	// RIGHT
+	if (rwidth + startx >= width+1) return false;
+	
+	//===CHECKS ROOM NOT TOO SMALL============
+	if (rwidth <= 1 || rheight <= 1) return false;
+
+	//===CHECKS ROOM NOT ON PLAYER SPAWN======
+	/*if (starty-1==0 && startx-1==0) return false;
+	if (startx-1==0 && starty-1<=0) return false;
+	if (starty-1==0 && startx-1<=0) return false;*/
+	
+	//===ROOM OVERLAP PREVENTION==============
+	const int xend = startx + rwidth;
+	const int yend = starty + rheight;
+	
+	for (int y = starty; (y < height+1) && (y <= yend) ; y++) {
+		for (int x = startx; (x < width+1) && (x <= xend) ; x++) {
+			if (isWall(y,x)) {
+				if (!((x == startx || x == xend) || (y == starty || y == yend))) {
+					return false; // PREVENTS ROOM FROM OVERLAPPING
+				}
+			}
+			
+			if (x == startx || x == xend) {
+				if (x-1 == 0) return false;
+			} 
+
+			if (y== starty || y == yend) {
+				if (y-1 == 0) return false;
+			}
+
+		}
+	}
+
+	return true;	
+}
+
 bool Map::isWall(int y, int x) {
 	return (arrMap[y][x] == VWALL) || (arrMap[y][x] == HWALL); 
 }
 
 void Map::CreateRoom(int starty, int startx, int rwidth, int rheight) {
-	for (int y = starty; y < height+1; y++) {
+	const int xend = startx + rwidth;
+	const int yend = starty + rheight;
 
-		for (int x = startx; x < height+1; x++) {
+	for (int y = starty; (y < height+1) && (y <= yend) ; y++) {
+
+		for (int x = startx; (x < width+1) && (x <= xend) ; x++) {
 			// ENSURES WE DONT OVERWRITE WALLS
 			if (!isWall(y, x)) {
 				if (x == startx || x == startx + rwidth) {
@@ -97,14 +141,7 @@ bool Map::RoomGen() {
 			//=====================================
 			//	CHECK IF ROOM WILL FIT
 			//=====================================
-			// BOTTOM
-			if (Room.height + y >= height+1) { 
-				continue; 
-			}
-			// RIGHT
-			if (Room.width + x >= width+1) { 
-				continue; 
-			}
+			if (!willRoomFit(y, x, Room.width, Room.height)) continue;
 			
 			std::string msg = "Position: " + std::to_string(x-1) + ";" + std::to_string(y-1);
 			msg += "\nWidth: " +  std::to_string(Room.width);
@@ -209,16 +246,11 @@ void Map::MapGen(){
 	    arrMap[y][width+1] = VWALL;
 	}
 
-	// Place player
-	arrMap[Player.y + 1][Player.x + 1]=PLAYER;
-	ycurs = 0;
-	xcurs = 0;
-
 	// PLACING PLAYER DECREASES SPACE
 	--spaceLeft;
 	
 	// GENERATES ROOMS
-	amtRooms = 1;
+	amtRooms = 2;
 	while(!RoomGen());
 
 	// Generates coins
@@ -228,6 +260,12 @@ void Map::MapGen(){
 	coinsLeft = 0;
 
 	while(!CoinGen()); // Ensures all coins generated
+	
+	// Place player
+	arrMap[Player.y + 1][Player.x + 1]=PLAYER;
+	ycurs = 0;
+	xcurs = 0;
+
 }
 
 //=======================
