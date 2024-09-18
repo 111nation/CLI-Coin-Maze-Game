@@ -27,9 +27,11 @@ Map::~Map () {
     // Deletes each row from memory
     for (int i = 0; i < height + 2; i++) {
         delete [] arrMap[i];
+	delete [] arrRoom[i];
     }
 
     delete [] arrMap;
+    delete [] arrRoom;
 }
 
 //=======================
@@ -42,174 +44,6 @@ int Map::getObject(int y, int x) {
 
 	return arrMap[y][x];			
 
-}
-
-bool Map::willRoomFit(int starty, int startx, int rwidth, int rheight) {
-	// ===CHECKS TO SEE WITHIN MAP BOUNDARY===
-	// BOTTOM
-	if (rheight + starty >= height+1) return false;
-	// RIGHT
-	if (rwidth + startx >= width+1) return false;
-	
-	//===CHECKS ROOM NOT TOO SMALL============
-	if (rwidth <= 1 || rheight <= 1) return false;
-
-	//===CHECKS ROOM NOT ON PLAYER SPAWN======
-	/*if (starty-1==0 && startx-1==0) return false;
-	if (startx-1==0 && starty-1<=0) return false;
-	if (starty-1==0 && startx-1<=0) return false;*/
-	
-	//===ROOM OVERLAP PREVENTION==============
-	const int xend = startx + rwidth;
-	const int yend = starty + rheight;
-	
-	for (int y = starty; (y < height+1) && (y <= yend) ; y++) {
-		for (int x = startx; (x < width+1) && (x <= xend) ; x++) {
-			if (isWall(y,x)) {
-				if (!((x == startx || x == xend) || (y == starty || y == yend))) {
-					return false; // PREVENTS ROOM FROM OVERLAPPING
-				}
-			}
-			
-			if (x == startx || x == xend) {
-				if (x-1 == 0) return false;
-			} 
-
-			if (y== starty || y == yend) {
-				if (y-1 == 0) return false;
-			}
-
-		}
-	}
-
-	return true;	
-}
-
-bool Map::isWall(int y, int x) {
-	return (arrMap[y][x] == VWALL) || (arrMap[y][x] == HWALL); 
-}
-
-void Map::CreateRoom(int starty, int startx, int rwidth, int rheight) {
-	const int xend = startx + rwidth;
-	const int yend = starty + rheight;
-
-	for (int y = starty; (y < height+1) && (y <= yend) ; y++) {
-
-		for (int x = startx; (x < width+1) && (x <= xend) ; x++) {
-			// ENSURES WE DONT OVERWRITE WALLS
-			if (!isWall(y, x)) {
-				if (x == startx || x == startx + rwidth) {
-				
-					arrMap[y][x] = VWALL; // LEFT AND RIGHT WALLS
-				
-				} else if (y == starty || y == starty + rheight) {
-					arrMap[y][x] = HWALL; // TOP AND BOTTOM WALLS
-				
-				} else {
-				
-					arrMap[y][x] = SPACE; // REGULAR SPACE
-				
-				}	
-					
-			}
-
-		}
-	
-	}
-}
-
-bool Map::RoomGen() {
-	srand(time(0));
-	// ROOM DATA
-	//int amtRooms = rand() % (int)(0.16 * (width * height) + 1);
-	struct struct_room { 
-		int width;
-		int height;
-		int area;
-	};
-
-	for (int y = 0; y < height+1; y++) {
-		for (int x=0; x < width+1; x++) {
-			if ((x-1 == 0) && (y-1 == 0)) continue; // Skip player position
-			// DATA OF HYPOTHETICAL ROOM
-			struct_room Room = {};
-			Room.width = (rand() % 10 ) + 1;
-			Message(std::to_string(Room.width));
-			Room.height = (rand() % 10 ) + 1;
-			Room.area = Room.width * Room.height;
-
-			//=====================================
-			//	CHECK IF ROOM WILL FIT
-			//=====================================
-			if (!willRoomFit(y, x, Room.width, Room.height)) continue;
-			
-			std::string msg = "Position: " + std::to_string(x-1) + ";" + std::to_string(y-1);
-			msg += "\nWidth: " +  std::to_string(Room.width);
-			msg += "\nHeight: " + std::to_string(Room.height);
-			Message(msg);
-
-			// CREATES ROOM
-			
-			CreateRoom(y, x, Room.width, Room.height);
-			--amtRooms;
-			if (amtRooms <= 0) return true;
-	
-		}
-
-	}
-
-	return false; // Rooms didnt finish generating	
-}
-
-
-bool Map::CoinGen() {
-	
-	srand(time(0));
-	
-	for (int y = 1; y < height+1; y++) {
-		for (int x=1; x < width+1; x++) {
-			if ((x-1 == 0) && (y-1 == 0)) continue; // Skip player position
-			if (arrMap[y][x] == COIN) continue; // Skip if coin already placed
-			if (arrMap[y][x] != SPACE) continue; // ENSURES ONLY SPACES ARE TAKEN
-			
-			//=====================================
-			// CHECKS SURROUNDING COINS
-			//=====================================
-			int surrounding_coins = 0;
-			// Counts surrounding coins
-			for (int sy=-3; sy<=3; sy++) {
-				for (int sx=-3; sx<=3; sx++){
-					if (sx == 0 && sy == 0) continue; // skips area which we asses
-					
-					int object = getObject(y+sy, x+sx);
-					if (object == COIN) {
-						++surrounding_coins;
-					}
-
-				}
-			}	
-
-			// Calculates probability of coin placed based on surrounding coins
-			//int probability = (int)(pow(2, (surrounding_coins+1))+10);
-			int probability = surrounding_coins+11;
-			probability = rand() % probability;
-			// Ensures coin generation not too rare
-			if (probability > 200) {
-				probability = (rand() % 201);
-			}	
-
-			// Randomly places coins		
-			if (probability == 1) {
-				++coinsLeft;
-				--spaceLeft;
-				arrMap[y][x] = COIN;
-			}
-
-			if (coinsLeft == coins) return true; // If all coins generated we exit
-		}
-	}
-
-	return false; // Not all coins where generated
 }
 
 void Map::MapGen(){
@@ -250,8 +84,8 @@ void Map::MapGen(){
 	--spaceLeft;
 	
 	// GENERATES ROOMS
-	amtRooms = 2;
-	while(!RoomGen());
+	InitRoom();
+	RoomGen();
 
 	// Generates coins
 	if (spaceLeft == 0) throw "Map has no space for coins";
@@ -485,10 +319,4 @@ void Map::Move(int x, int y) {
 			}
 		}
 
-}
-
-void Map::pickCoin() {
-	--coinsLeft;
-	
-	//Message("Coins: " + std::to_string(coins) + "\nCoins Left: " + std::to_string(coinsLeft));
 }

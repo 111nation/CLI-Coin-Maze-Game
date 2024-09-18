@@ -7,6 +7,9 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+//=======================
+// CURSER DATA
+//=======================
 #define ESC "\033["
 
 // DIRECTION
@@ -23,6 +26,15 @@
 #define PLAYER 2
 #define COIN 3
 #define SPACE 4
+
+//=======================
+// ARRAY ROOM DATA
+//=======================
+#define OCCUPIED 5
+#define UNOCCUPIED 6
+#define RWALL 7
+#define DOOR 8
+
 
 class Player {
 	public: 
@@ -46,7 +58,6 @@ class Map {
 	int coinsLeft = 0; // number of coins left
 	//SPACES
 	int spaceLeft = 0;
-	int amtRooms = 0;
 
 
     	//=======================
@@ -81,11 +92,18 @@ class Map {
     	//=======================
     	// ARRAY INITIALIZATION
     	//=======================
-	// ROOMS
+	// ROOM
+	int** arrRoom;
+	void InitRoom();
+
 	bool willRoomFit(int starty, int startx, int rwidth, int rheight);
 	bool isWall(int y, int x); 
 	void CreateRoom(int starty, int startx, int rwidth, int rheight);
 	bool RoomGen();
+	int calcRoomProb(int y, int x);
+	
+	// DOORS
+	void DoorGen();
 	
 	// OTHER
     	bool CoinGen(); // Return true if all coins generated
