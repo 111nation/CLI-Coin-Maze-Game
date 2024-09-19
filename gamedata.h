@@ -103,6 +103,7 @@ class Map {
 	int calcRoomProb(int y, int x);
 	
 	// DOORS
+	void floodFill(int y, int x, int**PATH, int*visitedSpaces, const int visited, const int unvisited);
 	void DoorGen();
 	
 	// OTHER

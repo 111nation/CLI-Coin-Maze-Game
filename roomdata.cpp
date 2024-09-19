@@ -21,6 +21,23 @@ void Map::InitRoom() {
 
 }
 
+void Map::floodFill(int y, int x, int** PATH, int* visitedSpaces, const int visited, const int unvisited) { 
+	// MAKE SURE WE DO NOT CROSS BOUNDARIES
+	if (x < 0 || y < 0 || x >= width+2 || y >= height+2) return;
+	
+	// ONLY ACCEPTS IF UNVISITED SPACE
+	if (!(PATH[y][x] == unvisited)) return;
+
+	PATH[y][x] = visited;	
+	++(*visitedSpaces);
+
+	// CHECK FOR SURROUNDING SPACES
+	floodFill(y, x + 1, PATH, visitedSpaces, visited, unvisited); // Right	
+	floodFill(y, x - 1, PATH, visitedSpaces, visited, unvisited); // Left
+	floodFill(y + 1, x, PATH, visitedSpaces, visited, unvisited); // Down
+	floodFill(y - 1, x, PATH, visitedSpaces, visited, unvisited); // Up
+}	
+
 void Map::DoorGen() {
 	// CREATES ARRAY FOR PATHFINDING
 	int** PATH = new int * [height+2];
@@ -41,37 +58,18 @@ void Map::DoorGen() {
 		}
 	}
 
-	// FLOOD-FILL TO CHECK IF WHOLE MAP ACCESSABLE
-	for (int y = 1; y < height+1; y++) {
-		for (int x = 1; x < width+1; x++) {
-			// COUNTS ACCESSABLE SPACE
-			if (arrMap[y][x] == SPACE) { 
-				--spaces;
-				PATH[y][x] = visited;
-			}
+	// CHECK IF ALL SPACES ARE VISITABLE
+	int visitedSpaces = 0; 
+	// 1;1 -- Player position
+	floodFill(1, 1, PATH, &visitedSpaces, visited, unvisited);
 
-			// DETERMINES WHERE TO GO NEXT
-			// ATTEMPS GOING RIGHT
-			if (PATH[y][x+1] != wall && !(x+1 >= width+1)) {
-				continue;
-			}	
-			// ATTEMPS GOING LEFT
-			if (PATH[y][x-1] != wall && !(x-1 < 0)) {
-				x-=2;
-				continue;
-			}	
-			// ATTEMPS GOING DOWN
-			if (PATH[y+1][x] != wall && !(y+1 >= height+1)) {
-				break;
-			}
-			// ATTEMPS GOING UP
-			if (PATH[y-1][x] != wall && !(y-1 < 0)) {
-				y-=2;
-				break;
-			}
-
-		}
-	}
+	
+	if (visitedSpaces == spaces)
+		Message("All " + std::to_string(spaces) + " are visited");
+	else 
+		Message("Only " + std::to_string(visitedSpaces) + " of " + std::to_string(spaces) + " are visited");
+	
+	//Message(std::to_string(visitedSpaces));
 
 	// CLEARS ARRAY FROM MEMORY
 	for (int y = 0; y < height+2; y++) {
@@ -215,8 +213,8 @@ bool Map::RoomGen() {
 			//==========================   
 
 			int prob = calcRoomProb(y, x);
-			
-            if (prob != 0) continue;	
+				
+            		if (prob != 0) continue;	
 
 			// DATA OF HYPOTHETICAL ROOM
 			struct_room Room = {};
@@ -229,10 +227,12 @@ bool Map::RoomGen() {
 		
 			CreateRoom(y, x, Room.width, Room.height);
 
-            Room = {};
+            		Room = {};
 		}
 
 	}
+
+	DoorGen();
 
 	return false; // Rooms didnt finish generating	
 }
