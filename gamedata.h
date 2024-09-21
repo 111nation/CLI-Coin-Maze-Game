@@ -26,6 +26,7 @@
 #define PLAYER 2
 #define COIN 3
 #define SPACE 4
+#define DOOR 8
 
 //=======================
 // ARRAY ROOM DATA
@@ -33,8 +34,7 @@
 #define OCCUPIED 5
 #define UNOCCUPIED 6
 #define RWALL 7
-#define DOOR 8
-
+#define RDOOR 9
 
 class Player {
 	public: 
@@ -100,10 +100,14 @@ class Map {
 	bool isWall(int y, int x); 
 	void CreateRoom(int starty, int startx, int rwidth, int rheight);
 	bool RoomGen();
+	void adjustForSharedWalls(int * y, int * x, int * rheight, int * rwidth);
 	int calcRoomProb(int y, int x);
 	
 	// DOORS
-	void floodFill(int y, int x, int**PATH, int*visitedSpaces, const int visited, const int unvisited);
+	bool createDoor(int y, int x, int ** PATH);
+	void resetPATH(int ** PATH, int * visitedSpaces);
+	bool isDoorPossible(const bool direction, int starty, int startx, int**PATH);
+	void floodFill(int y, int x, int**PATH, int*visitedSpaces);
 	void DoorGen();
 	
 	// OTHER

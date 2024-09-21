@@ -280,18 +280,22 @@ void Map::Move(int x, int y) {
 		// Checks what object player landed on
 		int objLanded = arrMap[newy + 1][newx + 1];
 		switch (objLanded) {
+
+			case DOOR:
 			case SPACE:
 				arrMap[newy + 1][newx + 1] = PLAYER;
 				moved = true;
 				break;
+
 			case COIN:
 				arrMap[newy + 1][newx + 1] = PLAYER;
 				moved = true;
 				break;
+
 			case VWALL:
-				break;
 			case HWALL:
 				break;
+
 			default: 
 				break;
 		}
