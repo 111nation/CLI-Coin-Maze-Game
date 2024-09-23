@@ -28,8 +28,10 @@ Map::~Map () {
     for (int i = 0; i < height + 2; i++) {
         delete [] arrMap[i];
 	delete [] arrRoom[i];
+	delete [] PATH[i];
     }
 
+    delete [] PATH;
     delete [] arrMap;
     delete [] arrRoom;
 }
@@ -345,3 +347,16 @@ bool Map::OutOfBounds(int y, int x, int height, int width) {
 	return false;
 }
 
+// Counts amount of the element in an array
+int Map::ObjCount(int ** ARR, const int obj) { 
+	int count = 0;
+	for (int y = 0; y < height + 2; y++) {
+		for (int x = 0; x < width + 2; x++) {
+			if (ARR[y][x] == obj) {
+				++count;
+			}	
+		}
+	}
+
+	return count;
+}

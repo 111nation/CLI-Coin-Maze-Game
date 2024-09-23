@@ -1,10 +1,5 @@
 #include "gamedata.h"
 
-
-//PATH DATA
-#define ROOM_VISITED 0
-#define ROOM_UNVISITED 1
-#define ROOM_WALL 2
 // PLAYER SPAWN
 #define SPAWNX 1
 #define SPAWNY 1
@@ -117,8 +112,6 @@ void Map::DoorGen() {
 	//=================================
 	// INITIALIZE FOR RANDOMIZING DOORS
 	//=================================
-	// CREATES ARRAY FOR PATHFINDING
-	int** PATH = new int * [height+2];
 	// TRACKS AND COUNTS SPACES
 	int spaces = 0;
 	for (int y = 0; y < height+2; y++) {
@@ -161,14 +154,16 @@ void Map::DoorGen() {
 		}
 
 	}
+	
+	// Resets PATH for later use
+	resetPATH(PATH, &visitedSpaces);
 
-
-	// CLEARS ARRAY FROM MEMORY
+/*	// CLEARS ARRAY FROM MEMORY
 	for (int y = 0; y < height+2; y++) {
 		delete [] PATH[y];
 	}
 
-	delete [] PATH;
+	delete [] PATH; */
 }
 
 int Map::calcRoomProb(int starty, int startx) {

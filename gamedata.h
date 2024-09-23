@@ -26,15 +26,23 @@
 #define PLAYER 2
 #define COIN 3
 #define SPACE 4
-#define DOOR 8
+#define DOOR 5
+#define MINE 6
 
 //=======================
 // ARRAY ROOM DATA
 //=======================
-#define OCCUPIED 5
-#define UNOCCUPIED 6
-#define RWALL 7
-#define RDOOR 9
+#define OCCUPIED 7
+#define UNOCCUPIED 8
+#define RWALL 9
+#define RDOOR 10
+
+//=======================
+// ARRAY PATH DATA
+//=======================
+#define ROOM_VISITED 0
+#define ROOM_UNVISITED 1
+#define ROOM_WALL 2
 
 class Player {
 	public: 
@@ -58,7 +66,12 @@ class Map {
 	int coinsLeft = 0; // number of coins left
 	//SPACES
 	int spaceLeft = 0;
-
+	// MINES
+	int mines=0;
+	// ROOMS
+	int** arrRoom;
+	// PATHFINDING
+	int** PATH = new int * [height+2];
 
     	//=======================
     	// MAP DISPLAY
@@ -88,12 +101,15 @@ class Map {
     
 	Map(int x, int y);
     	~Map();
-	
+
+	//=======================
+	// MINES
+	//=======================
+	void InitMines();
+
     	//=======================
-    	// ARRAY INITIALIZATION
+    	// ROOMS
     	//=======================
-	// ROOM
-	int** arrRoom;
 	void InitRoom();
 	bool RoomGen();
 	
@@ -115,7 +131,9 @@ class Map {
 	void floodFill(int y, int x, int**PATH, int*visitedSpaces);
 	void DoorGen();
 	
-	// OTHER
+    	//=======================
+    	// ARRAY INITIALIZATION
+    	//=======================
     	bool CoinGen(); // Return true if all coins generated
 	void MapGen();
 
@@ -155,4 +173,5 @@ class Map {
 	int getObject(int y, int x);
 	bool OutOfBounds(int y, int x);
 	bool OutOfBounds(int y, int x, int height, int width);
+	int ObjCount(int ** ARR, const int obj);
 };
