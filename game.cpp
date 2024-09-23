@@ -12,7 +12,7 @@ int main () {
 	// Initializes MAP
 	Map *map=nullptr;
 	try {
-		map = new Map(50,15);
+		map = new Map(100,25);
 		
 		if (!gameLoop(*map)){
 			// User quits game

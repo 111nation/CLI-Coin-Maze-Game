@@ -95,13 +95,17 @@ class Map {
 	// ROOM
 	int** arrRoom;
 	void InitRoom();
+	bool RoomGen();
+	
+	// WALL SHARING
+	void adjustWalls(int * y, int * x, int * room_width, int * room_height);
+	bool WallFoundx(const int starty, const int startx, const int wall_width); 
+	bool WallFoundy(const int starty, const int startx, const int wall_height);
 
-	bool isWallNearBy(int starty, int startx, const int yend, const int xend, const bool DIRECTION);
+	// ROOM CREATION
 	bool willRoomFit(int starty, int startx, int rwidth, int rheight);
 	bool isWall(int y, int x); 
 	void CreateRoom(int starty, int startx, int rwidth, int rheight);
-	bool RoomGen();
-	void adjustForSharedWalls(int * y, int * x, int * rheight, int * rwidth);
 	int calcRoomProb(int y, int x);
 	
 	// DOORS
@@ -149,4 +153,6 @@ class Map {
 	//=======================
 	wchar_t getChar(int y, int x);
 	int getObject(int y, int x);
+	bool OutOfBounds(int y, int x);
+	bool OutOfBounds(int y, int x, int height, int width);
 };

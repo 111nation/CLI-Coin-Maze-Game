@@ -210,11 +210,6 @@ bool Map::willRoomFit(int starty, int startx, int rwidth, int rheight) {
 	//===CHECKS ROOM NOT TOO SMALL============
 	if (rwidth <= 1 || rheight <= 1) return false;
 
-	//===CHECKS ROOM NOT ON PLAYER SPAWN======
-	/*if (starty-1==0 && startx-1==0) return false;
-	if (startx-1==0 && starty-1<=0) return false;
-	if (starty-1==0 && startx-1<=0) return false;*/
-	
 	//===ROOM OVERLAP PREVENTION==============
 	const int xend = startx + rwidth;
 	const int yend = starty + rheight;
@@ -286,6 +281,79 @@ void Map::CreateRoom(int starty, int startx, int rwidth, int rheight) {
 	}
 }
 
+//=============================================================================
+//	 		WALL SHARING LOGIC
+//=============================================================================
+// CHECKS IF SHARING WALLS NECISSARY
+bool Map::WallFoundx(const int starty, const int startx, const int wall_width) {
+	if (OutOfBounds(starty, startx, 0, wall_width)) return false;	
+	if (wall_width <= 0) return false;	
+	
+	for (int x = startx; x < width+1 && x <= (startx+wall_width); x++) {
+		if (arrRoom[starty][x] == RWALL) return true;
+	}	
+	
+	return false;
+}
+
+bool Map::WallFoundy(const int starty, const int startx, const int wall_height) {
+	if (OutOfBounds(starty, startx, wall_height, 0)) return false;	
+	if (wall_height <= 0) return false;	
+	
+	for (int y = starty; y < height+1 && y <= (starty+wall_height); y++) {
+		if (arrRoom[y][startx] == RWALL) return true;
+	}	
+	
+	return false;
+}
+
+
+
+void Map::adjustWalls(int * y, int * x, int * room_width, int * room_height) {
+	// PREVENTS ADJACENT WALLS BY SHIFTING THEM
+	// TO SHARE WALLS INSTEAD
+	
+	// PREVENTS OUT OF BOUNDS
+	if (*y < 0 || *x < 0) return;
+	if (*y + *room_height >= height+2 || *x + *room_width >= width+2) return;	
+		
+	//=========================================
+	// 	     VERTICAL WALLS
+	//=========================================	
+	// LEFT
+ 	   // ENSURES WALL NOT CONNECTED
+	if (!WallFoundy(*y, *x, *room_height) && WallFoundy(*y, *x-1, *room_height)) { 
+		--(*x);
+	} 
+	// RIGHT
+ 	   // ENSURES WALL NOT CONNECTED
+	if (!WallFoundy(*y, (*x + *room_width), *room_height)&&
+	    WallFoundy(*y, (*x + *room_width+1), *room_height)) { 
+		++(*room_width);
+	}
+
+	//=========================================
+	// 	     HORIZONTAL WALLS
+	//=========================================	
+	// TOP
+ 	   // ENSURES WALL NOT CONNECTED
+	if (!WallFoundx(*y, *x, *room_width) && WallFoundx(*y-1, *x, *room_width)) { 
+		--(*y);
+	} 
+	// BOTTOM
+ 	   // ENSURES WALL NOT CONNECTED
+	if (!WallFoundx((*y + *room_height), *x, *room_width)&&
+	    WallFoundx((*y + *room_height)+1, *x, *room_width)) { 
+		++(*room_height);
+	}
+
+	
+}
+
+//=============================================================================
+//	 		MAIN ROOM GENERATION
+//=============================================================================
+
 bool Map::RoomGen() {
 
 	struct struct_room { 
@@ -317,6 +385,7 @@ bool Map::RoomGen() {
 			//	CHECK IF ROOM WILL FIT
 			if (!willRoomFit(y, x, Room.width, Room.height)) continue;
 			
+			adjustWalls(&y, &x, &(Room.width), &(Room.height));			
 			CreateRoom(y, x, Room.width, Room.height);
 
             		Room = {};

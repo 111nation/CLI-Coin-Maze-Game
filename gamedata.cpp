@@ -326,3 +326,22 @@ void Map::Move(int x, int y) {
 		}
 
 }
+
+//======================
+//   UTILITIES
+//======================
+// CHECKS IF COORDINATES OUT OF BOUNDS
+bool Map::OutOfBounds(int y, int x) {
+	if (y < 0 || x < 0) return true;
+	if (y >= height+2 || x >= width+2) return true;
+
+	return false;
+}
+
+bool Map::OutOfBounds(int y, int x, int height, int width) {
+	if (height < 0 || width < 0) return true;
+	if (OutOfBounds(y, x) || OutOfBounds(y + height, x + width)) return true;
+	
+	return false;
+}
+
