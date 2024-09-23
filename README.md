@@ -32,6 +32,10 @@ Alternatively, use the *run.bat* file to automate the compilation. Requires g++ 
 
 The goal of this game is to collect as many coins as possible
 
+> [!NOTE]
+> Coins - 'C' <br/>
+> Player - 'V'
+
 <br /><br />
 
 <div align='center'>
