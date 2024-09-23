@@ -23,7 +23,7 @@ void Map::InitRoom() {
 		for (int j = 0; j < width+2; j++) {
 			if (j == 0 || j == width+1) {
 				arrRoom[i][j] = RWALL; // Indicates map walls
-			} else if (i == 0 || i == width+1) {
+			} else if (i == 0 || i == height+1) {
 				arrRoom[i][j] = RWALL; // Indicates map walls
 			} else {
 				arrRoom[i][j] = UNOCCUPIED;
@@ -286,71 +286,6 @@ void Map::CreateRoom(int starty, int startx, int rwidth, int rheight) {
 	}
 }
 
-void Map::adjustForSharedWalls(int * y, int * x, int * rheight, int * rwidth) {
- // RIGHT & BOTTOM
- int yend = *y + *rheight, xend = *x + *rwidth;
-
- // SKIPS IF ON BOUNDARY
- if (*y <= 0 || *y >= height+1) return;
- if (*x <= 0 || *x >= width+1) return;
- if (yend >= height+2 || xend >= width+2) return;
-
- //============================================
- // ENSURES ROOM WALLS ARE NOT SIDE BY SIDE,
- // RATHER SHARE A WALL
- //============================================
- 
- // NOTE: *y and *x are walls
- // Shifts room to start in adjacent wall
- // LEFT WALL
- if (arrRoom[*y][*x] != RWALL) {
- 	for (int ywall = 0; ywall < height+2; ywall++) {
- 		if (arrRoom[ywall][*x-1] == RWALL) {
-			--(*x);
-			break;			
-		}
- 	}
- }
-
- // TOP WALL
- if (arrRoom[*y][*x] != RWALL) {
- 	for (int xwall = 0; xwall < width+2; xwall++) {
- 		if (arrRoom[*y-1][xwall] == RWALL) {
-			--(*y);
-			break;			
-		}
- 	}
- }
-	
- // UPDATES XEND AND YEND: NECISSARY FOR WORKING WITH NEW START X AND Y
- yend = *y + *rheight;
- xend = *x + *rwidth;
-
- // RIGHT WALL
- if (arrRoom[yend][xend] != RWALL) {
- 	for (int ywall = 0; ywall < height+2; ywall++) {
- 		if (arrRoom[ywall][xend+2] == RWALL) {
-			++(*rwidth);
-			++xend;
-			break;			
-		}
- 	}
- }
-
- // BOTTOM WALL
- //if (yend+1 == height+1) throw "HI";
- if (arrRoom[yend][xend] != RWALL) {
- 	for (int xwall = 0; xwall < width+2; xwall++) {
- 		if (arrRoom[yend+1][xwall] == RWALL) {
-			++(*rheight);
-			++yend;
-			break;			
-		}
- 	}
- }
-
-}
-
 bool Map::RoomGen() {
 
 	struct struct_room { 
@@ -375,15 +310,13 @@ bool Map::RoomGen() {
 
 			// DATA OF HYPOTHETICAL ROOM
 			struct_room Room = {};
-			Room.width = (rand() % 10 ) + 1;
-			Room.height = (rand() % 10 ) + 1;
+			Room.width = (rand() % 10 ) + 2;
+			Room.height = (rand() % 10 ) + 2;
 			Room.area = Room.width * Room.height;
 				
 			//	CHECK IF ROOM WILL FIT
 			if (!willRoomFit(y, x, Room.width, Room.height)) continue;
 			
-			adjustForSharedWalls(&y, &x, &Room.height, &Room.width);	
-
 			CreateRoom(y, x, Room.width, Room.height);
 
             		Room = {};

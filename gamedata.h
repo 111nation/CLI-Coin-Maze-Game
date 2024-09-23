@@ -96,6 +96,7 @@ class Map {
 	int** arrRoom;
 	void InitRoom();
 
+	bool isWallNearBy(int starty, int startx, const int yend, const int xend, const bool DIRECTION);
 	bool willRoomFit(int starty, int startx, int rwidth, int rheight);
 	bool isWall(int y, int x); 
 	void CreateRoom(int starty, int startx, int rwidth, int rheight);

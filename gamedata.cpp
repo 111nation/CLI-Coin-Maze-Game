@@ -68,6 +68,8 @@ void Map::MapGen(){
 		arrMap[y][0] = VWALL;
 			
 		for (int x = 1; x < width+1; x++){
+			
+
 			// Handles last row of walls
 			if ((y == height+1)||(y==0)) { // TOP ROW
 				arrMap[y][x] = HWALL;
