@@ -6,3 +6,5 @@
 backup/
 
 git rm --cached run.bat
+git rm --cached compile.bat
+
