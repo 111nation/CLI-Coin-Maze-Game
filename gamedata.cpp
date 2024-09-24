@@ -91,6 +91,9 @@ void Map::MapGen(){
 	InitRoom();
 	RoomGen();
 
+	// Generates mines
+	InitMines();
+
 	// Generates coins
 	if (spaceLeft == 0) throw "Map has no space for coins";
 	coins = (int)(spaceLeft*0.3);
@@ -261,6 +264,8 @@ wchar_t Map::getChar(int y, int x) {
 			return hwall;
 		case VWALL:
 			return vwall;
+		case MINE: 
+			return mine;
 
 		default: 
 			return space;
@@ -286,6 +291,7 @@ void Map::Move(int x, int y) {
 		switch (objLanded) {
 
 			case DOOR:
+			case MINE:
 			case SPACE:
 				arrMap[newy + 1][newx + 1] = PLAYER;
 				moved = true;

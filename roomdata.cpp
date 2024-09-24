@@ -1,8 +1,5 @@
 #include "gamedata.h"
 
-// PLAYER SPAWN
-#define SPAWNX 1
-#define SPAWNY 1
 // DIRECTION DATA
 #define HORIZONTAL true
 #define VERTICAL false
@@ -356,6 +353,11 @@ bool Map::RoomGen() {
 		int height;
 		int area;
 	};
+	
+	//========================================
+	int multiplier_width = (int)(width / 20);
+	int multiplier_height = (int)(height / 20);
+	//========================================
 
     srand(time(0));
 
@@ -373,8 +375,8 @@ bool Map::RoomGen() {
 
 			// DATA OF HYPOTHETICAL ROOM
 			struct_room Room = {};
-			Room.width = (rand() % 10 ) + 2;
-			Room.height = (rand() % 10 ) + 2;
+			Room.width = (rand() % 7) + multiplier_width;
+			Room.height = (rand() % 7) + multiplier_height;
 			Room.area = Room.width * Room.height;
 				
 			//	CHECK IF ROOM WILL FIT

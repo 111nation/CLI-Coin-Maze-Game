@@ -44,6 +44,11 @@
 #define ROOM_UNVISITED 1
 #define ROOM_WALL 2
 
+// PLAYER SPAWN
+#define SPAWNX 1
+#define SPAWNY 1
+
+
 class Player {
 	public: 
 	int x, y; 
@@ -80,6 +85,7 @@ class Map {
     	const wchar_t hwall = L'-';	
 	const wchar_t space = L' ';
 	const wchar_t coin = L'C';
+	const wchar_t mine = L'*';
 	
     	//=======================
 	//PLAYER
@@ -106,6 +112,8 @@ class Map {
 	// MINES
 	//=======================
 	void InitMines();
+	void placeMines(int amount_of_mines, int * placed_mines);
+	void deleteBlockingMines(int * visitedSpaces, int * total_mines);
 
     	//=======================
     	// ROOMS
@@ -174,4 +182,5 @@ class Map {
 	bool OutOfBounds(int y, int x);
 	bool OutOfBounds(int y, int x, int height, int width);
 	int ObjCount(int ** ARR, const int obj);
+	bool isBlocking(int y, int x, int ** PATH);
 };
