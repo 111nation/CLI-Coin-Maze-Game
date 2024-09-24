@@ -23,7 +23,7 @@ Version 1
 **Running:** <br />
 Currently, no binary version is available, install this repository and use g++ to build each *.cpp* file and link them together.
 <br />
-Alternatively, use the *run.bat* file to automate the compilation. Requires g++ compiler.
+Alternatively, use the *compile.bat* file to automate the compilation. Requires g++ compiler.
 
 ## Tutorial
 
