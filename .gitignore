@@ -1,6 +1,7 @@
 *.o
 *.exe
 *.bat
+run.bat
 *.swp
 *.swo
 backup/
