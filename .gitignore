@@ -5,5 +5,3 @@
 *.swo
 backup/
 
-
-git rm --cached run.bat
