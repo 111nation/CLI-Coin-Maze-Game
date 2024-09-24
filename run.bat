@@ -1,9 +1,5 @@
 @echo off
 
-if exist "Game.exe" (
-	del "Game.exe"
-)
-
 g++ -c game.cpp
 g++ -c gamedata.cpp
 g++ -c roomdata.cpp
@@ -14,6 +10,8 @@ if exist *.o (
 	del *.o 
 )
 
+if exist "Game.exe" (
+	 .\Game.exe
+)
+
 @echo on
-echo .
-echo Run the game from Game.exe
