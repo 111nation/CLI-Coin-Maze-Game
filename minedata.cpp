@@ -14,7 +14,6 @@ void Map::InitMines() {
 		for (int x = 0; x < width+2; x++) {
 			int obj = arrMap[y][x];
 			if (obj == PLAYER || obj == SPACE || obj == DOOR){
-				++spaces;
 				PATH[y][x] = ROOM_UNVISITED; // INDICATES UNVISITED SPACE	
 			} else {
 				PATH[y][x] = ROOM_WALL;
@@ -39,6 +38,8 @@ void Map::InitMines() {
 			//======IF MINES ARE BLOCKING PATH==================
 			if (visitedSpaces < spaces) { 
 				deleteBlockingMines(&visitedSpaces, &total_mines);				
+				resetPATH(PATH, &visitedSpaces);
+				floodFill(SPAWNY, SPAWNX, PATH, &visitedSpaces);
 			}
 
 		}	

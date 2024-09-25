@@ -9,16 +9,16 @@ void Map::InitRoom() {
 	arrRoom = new int*[height + 2]; 
 
     	// Sets amount of coloumns for array
-    	for (int i = 0; i < height+2;i++) {
-        	arrRoom[i] = new int[width+2];
+    	for (int y = 0; y < height+2;y++) {
+        	arrRoom[y] = new int[width+2];
 		// UNOCCUPIES SPACE
-		for (int j = 0; j < width+2; j++) {
-			if (j == 0 || j == width+1) {
-				arrRoom[i][j] = RWALL; // Indicates map walls
-			} else if (i == 0 || i == height+1) {
-				arrRoom[i][j] = RWALL; // Indicates map walls
+		for (int x = 0; x < width+2; x++) {
+			if (x == 0 || x == width+1) {
+				arrRoom[y][x] = RWALL; // Indicates map walls
+			} else if (y == 0 || y == height+1) {
+				arrRoom[y][x] = RWALL; // Indicates map walls
 			} else {
-				arrRoom[i][j] = UNOCCUPIED;
+				arrRoom[y][x] = UNOCCUPIED;
 			}
 		}
     	}
@@ -116,7 +116,7 @@ void Map::DoorGen() {
 			PATH[y] = new int [width+2];
 		for (int x = 0; x < width+2; x++) {
 			int obj = arrMap[y][x];
-			if (obj == PLAYER || obj == SPACE){
+			if (obj == PLAYER || obj == SPACE || obj == DOOR){
 				++spaces;
 				PATH[y][x] = ROOM_UNVISITED; // INDICATES UNVISITED SPACE	
 			} else {
@@ -151,6 +151,9 @@ void Map::DoorGen() {
 		}
 
 	}
+
+	Message("Visited Spaces: " + std::to_string(visitedSpaces) + 
+			"\nTotal Spaces: " + std::to_string(spaces));
 	
 	// Resets PATH for later use
 	resetPATH(PATH, &visitedSpaces);
@@ -193,14 +196,17 @@ int Map::calcRoomProb(int starty, int startx) {
 }
 
 bool Map::willRoomFit(int starty, int startx, int rwidth, int rheight) {
+	// ===PREVENT PLACING ON PLAYER===========
+	if (starty == SPAWNY && startx == SPAWNX) return false;
+	
 	// ===CHECKS TO SEE WITHIN MAP BOUNDARY===
 	// BOTTOM
-	if (rheight + starty >= height+1) return false;
+	if (rheight + starty >= height+2) return false;
 	// RIGHT
-	if (rwidth + startx >= width+1) return false;
+	if (rwidth + startx >= width+2) return false;
 	
 	//===CHECKS ROOM NOT TOO SMALL============
-	if (rwidth <= 1 || rheight <= 1) return false;
+	if (rwidth <= 3 || rheight <= 3) return false;
 
 	//===ROOM OVERLAP PREVENTION==============
 	const int xend = startx + rwidth;
@@ -223,6 +229,7 @@ bool Map::willRoomFit(int starty, int startx, int rwidth, int rheight) {
 				return false;
 			}
 			
+			/*
 			if (x == startx || x == xend) {
 				if (x-1 == 0) return false;
 			} 
@@ -230,6 +237,7 @@ bool Map::willRoomFit(int starty, int startx, int rwidth, int rheight) {
 			if (y== starty || y == yend) {
 				if (y-1 == 0) return false;
 			}
+			*/
 
 		}
 	}
@@ -389,7 +397,7 @@ bool Map::RoomGen() {
 		}
 
 	}
-
+	
 	DoorGen();
 
 	return false; // Rooms didnt finish generating	

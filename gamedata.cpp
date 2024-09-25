@@ -92,7 +92,7 @@ void Map::MapGen(){
 	RoomGen();
 
 	// Generates mines
-	InitMines();
+	//InitMines();
 
 	// Generates coins
 	if (spaceLeft == 0) throw "Map has no space for coins";
