@@ -69,8 +69,6 @@ class Map {
 	// COINS
 	int coins = 0; // number of coins to collect 
 	int coinsLeft = 0; // number of coins left
-	//SPACES
-	int spaceLeft = 0;
 	// MINES
 	int mines=0;
 	// ROOMS
@@ -179,8 +177,12 @@ class Map {
 	//=======================
 	wchar_t getChar(int y, int x);
 	int getObject(int y, int x);
+
+	bool OnBoundary(int y, int x);
+	bool OnBoundary(int y, int x, int pheight, int pwidth);
 	bool OutOfBounds(int y, int x);
-	bool OutOfBounds(int y, int x, int height, int width);
+	bool OutOfBounds(int y, int x, int pheight, int pwidth);
+
 	int ObjCount(int ** ARR, const int obj);
 	bool isBlocking(int y, int x, int ** PATH);
 };

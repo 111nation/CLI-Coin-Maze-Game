@@ -8,6 +8,7 @@ char getKeyStroke();
 bool gameLoop (Map map);
 
 int main () {
+	system("cls");
 	std::setlocale(LC_ALL, ""); // Enables UTF-8 by setting language settings to all
 	// Initializes MAP
 	Map *map=nullptr;

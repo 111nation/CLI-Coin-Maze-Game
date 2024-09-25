@@ -37,7 +37,6 @@ bool Map::CoinGen() {
 			// Randomly places coins		
 			if (probability == 1) {
 				++coinsLeft;
-				--spaceLeft;
 				arrMap[y][x] = COIN;
 			}
 

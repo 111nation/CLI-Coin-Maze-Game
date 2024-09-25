@@ -25,6 +25,9 @@ void Map::InitRoom() {
 
 }
 
+//=============================================================================
+//	 		DOOR GENERATION LOGIC
+//=============================================================================
 bool Map::isDoorPossible (const bool direction, int starty, int startx, int**PATH) {
 
 	// ENSURES COORDINATES NOT OUT OF BOUNDS (INSIDE MAP NOT BOUNDARIES)
@@ -109,32 +112,36 @@ void Map::DoorGen() {
 	//=================================
 	// INITIALIZE FOR RANDOMIZING DOORS
 	//=================================
+	int spaces=0;
 	// TRACKS AND COUNTS SPACES
-	int spaces = 0;
 	for (int y = 0; y < height+2; y++) {
 			// CREATES COLUMNS
 			PATH[y] = new int [width+2];
 		for (int x = 0; x < width+2; x++) {
 			int obj = arrMap[y][x];
-			if (obj == PLAYER || obj == SPACE || obj == DOOR){
-				++spaces;
+			if (obj == PLAYER || obj == SPACE){
 				PATH[y][x] = ROOM_UNVISITED; // INDICATES UNVISITED SPACE	
+				++spaces;
 			} else {
 				PATH[y][x] = ROOM_WALL;
 			}
 		}
 	}
-
+	
 	//===========================
 	// CREATE DOORS
 	//===========================
-	int visitedSpaces = 0; 
+	int visitedSpaces = 0;
+       	
+	resetPATH(PATH, &visitedSpaces);	
 	floodFill(SPAWNY, SPAWNX, PATH, &visitedSpaces);
-
+	
+	std::cerr << arrMap[1][1];
 	while (visitedSpaces < spaces) {
 		bool doorAdded = false;
 		for (int y = 1; y < height+1; y++) {
 			for (int x = 1; x < width+1; x++) {
+				doorAdded = false;
 				int prob = rand() % 10;
 				// 1 IN 10 CHANCE OF ATTEMPTING TO CREATE DOOR	
 				if (isDoorPossible (VERTICAL, y, x, PATH) && prob == 0) { 
@@ -142,19 +149,18 @@ void Map::DoorGen() {
 				} else if (isDoorPossible(HORIZONTAL, y, x, PATH) && prob == 1) {
 					doorAdded = createDoor(y, x, PATH);
 				}
+
+				if (doorAdded == true) {
+					++spaces;
+					resetPATH(PATH, &visitedSpaces);
+					floodFill(SPAWNY, SPAWNX, PATH, &visitedSpaces);
+				}
 			}
 		}
-		
-		if (doorAdded == true) {
-			resetPATH(PATH, &visitedSpaces);
-			floodFill(SPAWNY, SPAWNX, PATH, &visitedSpaces);
-		}
-
 	}
 
 	Message("Visited Spaces: " + std::to_string(visitedSpaces) + 
-			"\nTotal Spaces: " + std::to_string(spaces));
-	
+			"\nTotal Spaces: " + std::to_string(spaces));	
 	// Resets PATH for later use
 	resetPATH(PATH, &visitedSpaces);
 
@@ -259,14 +265,11 @@ void Map::CreateRoom(int starty, int startx, int rwidth, int rheight) {
 			// ENSURES WE DONT OVERWRITE WALLS
 			if (!isWall(y, x)) {
 				if (x == startx || x == xend) {
-					
 					arrMap[y][x] = VWALL; // LEFT AND RIGHT WALLS
 					arrRoom[y][x] = RWALL;
-					--spaceLeft; // Space decreases
 				} else if (y == starty || y == yend) {
 					arrMap[y][x] = HWALL; // TOP AND BOTTOM WALLS
 					arrRoom[y][x] = RWALL;
-					--spaceLeft;
 				} else {
 				
 					arrMap[y][x] = SPACE; // REGULAR SPACE
@@ -287,11 +290,13 @@ void Map::CreateRoom(int starty, int startx, int rwidth, int rheight) {
 // CHECKS IF SHARING WALLS NECISSARY
 bool Map::WallFoundx(const int starty, const int startx, const int wall_width) {
 	if (OutOfBounds(starty, startx, 0, wall_width)) return false;	
-	if (wall_width <= 0) return false;	
-	
+	if (wall_width <= 0) return false;
+	// If on boundary wall found
+	if (OnBoundary(starty, startx) || OnBoundary(starty, startx, 0, wall_width)) return true;
+
 	for (int x = startx; x < width+1 && x <= (startx+wall_width); x++) {
 		if (arrRoom[starty][x] == RWALL) return true;
-	}	
+	}
 	
 	return false;
 }
@@ -299,6 +304,8 @@ bool Map::WallFoundx(const int starty, const int startx, const int wall_width) {
 bool Map::WallFoundy(const int starty, const int startx, const int wall_height) {
 	if (OutOfBounds(starty, startx, wall_height, 0)) return false;	
 	if (wall_height <= 0) return false;	
+	// If on boundary wall found
+	if (OnBoundary(starty, startx) || OnBoundary(starty, startx, wall_height, 0)) return true;
 	
 	for (int y = starty; y < height+1 && y <= (starty+wall_height); y++) {
 		if (arrRoom[y][startx] == RWALL) return true;
@@ -322,13 +329,13 @@ void Map::adjustWalls(int * y, int * x, int * room_width, int * room_height) {
 	//=========================================	
 	// LEFT
  	   // ENSURES WALL NOT CONNECTED
-	if (!WallFoundy(*y, *x, *room_height) && WallFoundy(*y, *x-1, *room_height)) { 
+	if ((!WallFoundy(*y, *x, *room_height) && WallFoundy(*y, *x-1, *room_height)) || (*x == 1)) { 
 		--(*x);
 	} 
 	// RIGHT
  	   // ENSURES WALL NOT CONNECTED
-	if (!WallFoundy(*y, (*x + *room_width), *room_height)&&
-	    WallFoundy(*y, (*x + *room_width+1), *room_height)) { 
+	if ((!WallFoundy(*y, (*x + *room_width), *room_height)&&
+	    WallFoundy(*y, (*x + *room_width+1), *room_height)) || (*x+*room_width==width)) { 
 		++(*room_width);
 	}
 
@@ -337,13 +344,13 @@ void Map::adjustWalls(int * y, int * x, int * room_width, int * room_height) {
 	//=========================================	
 	// TOP
  	   // ENSURES WALL NOT CONNECTED
-	if (!WallFoundx(*y, *x, *room_width) && WallFoundx(*y-1, *x, *room_width)) { 
+	if ((!WallFoundx(*y, *x, *room_width) && WallFoundx(*y-1, *x, *room_width)) || (*y==1)) { 
 		--(*y);
 	} 
 	// BOTTOM
  	   // ENSURES WALL NOT CONNECTED
-	if (!WallFoundx((*y + *room_height), *x, *room_width)&&
-	    WallFoundx((*y + *room_height)+1, *x, *room_width)) { 
+	if ((!WallFoundx((*y + *room_height), *x, *room_width)&&
+	    WallFoundx((*y + *room_height)+1, *x, *room_width)) || (*y+*room_height == height)) { 
 		++(*room_height);
 	}
 
@@ -361,13 +368,12 @@ bool Map::RoomGen() {
 		int height;
 		int area;
 	};
-	
+
+	srand(time(0));
 	//========================================
 	int multiplier_width = (int)(width / 20);
 	int multiplier_height = (int)(height / 20);
 	//========================================
-
-    srand(time(0));
 
 	for (int y = 0; y < height+1; y++) {
 		for (int x=0; x < width+1; x++) {
@@ -383,22 +389,24 @@ bool Map::RoomGen() {
 
 			// DATA OF HYPOTHETICAL ROOM
 			struct_room Room = {};
-			Room.width = (rand() % 7) + multiplier_width;
-			Room.height = (rand() % 7) + multiplier_height;
+			Room.width = (rand() % 5-3) + multiplier_width+3;
+			Room.height = (rand() % 5-3) + multiplier_height+3;
 			Room.area = Room.width * Room.height;
-				
+
+						
+			adjustWalls(&y, &x, &(Room.width), &(Room.height));
+
 			//	CHECK IF ROOM WILL FIT
 			if (!willRoomFit(y, x, Room.width, Room.height)) continue;
 			
-			adjustWalls(&y, &x, &(Room.width), &(Room.height));			
 			CreateRoom(y, x, Room.width, Room.height);
 
             		Room = {};
 		}
 
 	}
-	
-	DoorGen();
 
+	DoorGen();
+	std::cout << "DOOR GEN DIDNT CAUSE CRASH";	
 	return false; // Rooms didnt finish generating	
 }

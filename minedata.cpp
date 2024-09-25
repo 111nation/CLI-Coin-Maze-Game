@@ -144,7 +144,6 @@ void Map::placeMines(int amount_of_mines, int * placed_mines) {
 			// Randomly places mine		
 			if (probability == 1 && (*placed_mines < amount_of_mines)) {
 				++(*placed_mines);
-				--spaceLeft;
 				arrMap[y][x] = MINE;
 				PATH[y][x] = ROOM_WALL;
 			}
