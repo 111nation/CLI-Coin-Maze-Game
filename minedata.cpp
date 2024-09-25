@@ -14,6 +14,7 @@ void Map::InitMines() {
 		for (int x = 0; x < width+2; x++) {
 			int obj = arrMap[y][x];
 			if (obj == PLAYER || obj == SPACE || obj == DOOR){
+				++spaces;
 				PATH[y][x] = ROOM_UNVISITED; // INDICATES UNVISITED SPACE	
 			} else {
 				PATH[y][x] = ROOM_WALL;
@@ -32,12 +33,17 @@ void Map::InitMines() {
 		placeMines(mines - total_mines, &placed); 
 		if (placed > 0) {
 			total_mines+=placed;
+			spaces-=placed;
 			//===== CHECKS IF WHOLE MAP ACCESSABLE OR NOT ======
 			resetPATH(PATH, &visitedSpaces);
 			floodFill(SPAWNY, SPAWNX, PATH, &visitedSpaces);
 			//======IF MINES ARE BLOCKING PATH==================
-			if (visitedSpaces < spaces) { 
-				deleteBlockingMines(&visitedSpaces, &total_mines);				
+			if (visitedSpaces < spaces) {
+			       	int deleted = 0;	
+				deleteBlockingMines(&visitedSpaces, &deleted);
+				spaces+=deleted;
+				total_mines-=placed;
+
 				resetPATH(PATH, &visitedSpaces);
 				floodFill(SPAWNY, SPAWNX, PATH, &visitedSpaces);
 			}
@@ -46,10 +52,17 @@ void Map::InitMines() {
 	}
 	
 	
+	Message("\nMINES ON MAP: " + std::to_string(ObjCount(arrMap, MINE)) + 
+		"\n\nMINES: " + std::to_string(mines) +
+		"\nTOTAL MINES: " + std::to_string(total_mines) +
+		"\nVISITED: " + std::to_string(visitedSpaces) +
+		"\nSPACES: " + std::to_string(spaces) +
+		"\n");
+
 }
 
-void Map::deleteBlockingMines(int * visitedSpaces, int * total_mines) {
-	int deleted = 0;
+void Map::deleteBlockingMines(int * visitedSpaces, int * deleted) {
+	*deleted = 0;
 	// DELETES ALL MINES BLOCKING PATH
 	// LOOPS ALL ADJACENT TILES
 	resetPATH(PATH, visitedSpaces);
@@ -66,15 +79,12 @@ void Map::deleteBlockingMines(int * visitedSpaces, int * total_mines) {
 					// Updates reachable areas
 					resetPATH(PATH, visitedSpaces);
 					floodFill(SPAWNY, SPAWNX, PATH, visitedSpaces);
-					++deleted;
+					++(*deleted);
 
 				}
 			}
 		}
 	}	
-
-	total_mines-=deleted;
-
 }
 
 bool Map::isBlocking(int y, int x, int ** PATH) {

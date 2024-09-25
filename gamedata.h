@@ -111,7 +111,7 @@ class Map {
 	//=======================
 	void InitMines();
 	void placeMines(int amount_of_mines, int * placed_mines);
-	void deleteBlockingMines(int * visitedSpaces, int * total_mines);
+	void deleteBlockingMines(int * visitedSpaces, int * deleted);
 
     	//=======================
     	// ROOMS

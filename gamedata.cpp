@@ -87,7 +87,7 @@ void Map::MapGen(){
 	RoomGen();
 
 	// Generates mines
-	//InitMines();
+	InitMines();
 
 	int space_for_coins = ObjCount(arrMap, SPACE);
 	// Generates coins

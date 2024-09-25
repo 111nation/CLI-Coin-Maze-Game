@@ -158,18 +158,9 @@ void Map::DoorGen() {
 			}
 		}
 	}
-
-	Message("Visited Spaces: " + std::to_string(visitedSpaces) + 
-			"\nTotal Spaces: " + std::to_string(spaces));	
+	
 	// Resets PATH for later use
 	resetPATH(PATH, &visitedSpaces);
-
-/*	// CLEARS ARRAY FROM MEMORY
-	for (int y = 0; y < height+2; y++) {
-		delete [] PATH[y];
-	}
-
-	delete [] PATH; */
 }
 
 int Map::calcRoomProb(int starty, int startx) {
