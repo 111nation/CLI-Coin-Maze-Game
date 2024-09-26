@@ -26,15 +26,28 @@
 #define PLAYER 2
 #define COIN 3
 #define SPACE 4
-#define DOOR 8
+#define DOOR 5
+#define MINE 6
 
 //=======================
 // ARRAY ROOM DATA
 //=======================
-#define OCCUPIED 5
-#define UNOCCUPIED 6
-#define RWALL 7
-#define RDOOR 9
+#define OCCUPIED 7
+#define UNOCCUPIED 8
+#define RWALL 9
+#define RDOOR 10
+
+//=======================
+// ARRAY PATH DATA
+//=======================
+#define ROOM_VISITED 0
+#define ROOM_UNVISITED 1
+#define ROOM_WALL 2
+
+// PLAYER SPAWN
+#define SPAWNX 1
+#define SPAWNY 1
+
 
 class Player {
 	public: 
@@ -56,9 +69,12 @@ class Map {
 	// COINS
 	int coins = 0; // number of coins to collect 
 	int coinsLeft = 0; // number of coins left
-	//SPACES
-	int spaceLeft = 0;
-
+	// MINES
+	int mines=0;
+	// ROOMS
+	int** arrRoom;
+	// PATHFINDING
+	int** PATH = new int * [height+2];
 
     	//=======================
     	// MAP DISPLAY
@@ -67,6 +83,7 @@ class Map {
     	const wchar_t hwall = L'-';	
 	const wchar_t space = L' ';
 	const wchar_t coin = L'C';
+	const wchar_t mine = L'*';
 	
     	//=======================
 	//PLAYER
@@ -88,12 +105,17 @@ class Map {
     
 	Map(int x, int y);
     	~Map();
-	
+
+	//=======================
+	// MINES
+	//=======================
+	void InitMines();
+	void placeMines(int amount_of_mines, int * placed_mines);
+	void deleteBlockingMines(int * visitedSpaces, int * deleted);
+
     	//=======================
-    	// ARRAY INITIALIZATION
+    	// ROOMS
     	//=======================
-	// ROOM
-	int** arrRoom;
 	void InitRoom();
 	bool RoomGen();
 	
@@ -115,7 +137,9 @@ class Map {
 	void floodFill(int y, int x, int**PATH, int*visitedSpaces);
 	void DoorGen();
 	
-	// OTHER
+    	//=======================
+    	// ARRAY INITIALIZATION
+    	//=======================
     	bool CoinGen(); // Return true if all coins generated
 	void MapGen();
 
@@ -153,6 +177,12 @@ class Map {
 	//=======================
 	wchar_t getChar(int y, int x);
 	int getObject(int y, int x);
+
+	bool OnBoundary(int y, int x);
+	bool OnBoundary(int y, int x, int pheight, int pwidth);
 	bool OutOfBounds(int y, int x);
-	bool OutOfBounds(int y, int x, int height, int width);
+	bool OutOfBounds(int y, int x, int pheight, int pwidth);
+
+	int ObjCount(int ** ARR, const int obj);
+	bool isBlocking(int y, int x, int ** PATH);
 };

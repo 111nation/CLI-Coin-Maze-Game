@@ -28,8 +28,10 @@ Map::~Map () {
     for (int i = 0; i < height + 2; i++) {
         delete [] arrMap[i];
 	delete [] arrRoom[i];
+	delete [] PATH[i];
     }
 
+    delete [] PATH;
     delete [] arrMap;
     delete [] arrRoom;
 }
@@ -53,7 +55,6 @@ void Map::MapGen(){
 	//============================
 	coinsLeft = 0;
 	coins = 0;
-	spaceLeft = 0;
 	
 	arrMap = new int*[height + 2]; 
 
@@ -75,23 +76,23 @@ void Map::MapGen(){
 				arrMap[y][x] = HWALL;
 			} else {
              		   arrMap[y][x] = SPACE;
-			   ++spaceLeft;
            		}
 		}
 
 	    arrMap[y][width+1] = VWALL;
 	}
 
-	// PLACING PLAYER DECREASES SPACE
-	--spaceLeft;
-	
 	// GENERATES ROOMS
 	InitRoom();
 	RoomGen();
 
+	// Generates mines
+	InitMines();
+
+	int space_for_coins = ObjCount(arrMap, SPACE);
 	// Generates coins
-	if (spaceLeft == 0) throw "Map has no space for coins";
-	coins = (int)(spaceLeft*0.3);
+	if (space_for_coins == 0) throw "Map has no space for coins";
+	coins = (int)(space_for_coins*0.3);
 
 	coinsLeft = 0;
 
@@ -259,6 +260,8 @@ wchar_t Map::getChar(int y, int x) {
 			return hwall;
 		case VWALL:
 			return vwall;
+		case MINE: 
+			return mine;
 
 		default: 
 			return space;
@@ -284,6 +287,7 @@ void Map::Move(int x, int y) {
 		switch (objLanded) {
 
 			case DOOR:
+			case MINE:
 			case SPACE:
 				arrMap[newy + 1][newx + 1] = PLAYER;
 				moved = true;
@@ -330,7 +334,9 @@ void Map::Move(int x, int y) {
 //======================
 //   UTILITIES
 //======================
-// CHECKS IF COORDINATES OUT OF BOUNDS
+//=======================================================
+//		BOUNDARY CHECKING
+//=======================================================
 bool Map::OutOfBounds(int y, int x) {
 	if (y < 0 || x < 0) return true;
 	if (y >= height+2 || x >= width+2) return true;
@@ -338,10 +344,40 @@ bool Map::OutOfBounds(int y, int x) {
 	return false;
 }
 
-bool Map::OutOfBounds(int y, int x, int height, int width) {
-	if (height < 0 || width < 0) return true;
-	if (OutOfBounds(y, x) || OutOfBounds(y + height, x + width)) return true;
+bool Map::OutOfBounds(int y, int x, int pheight, int pwidth) {
+	if (pheight < 0 || pwidth < 0) return true;
+	if (OutOfBounds(y, x) || OutOfBounds(y + pheight, x + pwidth)) return true;
 	
 	return false;
 }
+
+bool Map::OnBoundary(int y, int x) {
+	if (y == 0 || x == 0) return true;
+	if (y == height+1 || x == width+1) return true;
+
+	return false;
+}
+
+bool Map::OnBoundary(int y, int x, int pheight, int pwidth) {
+	if (pheight < 0 || pwidth < 0) return true;
+	if (OnBoundary(y, x) || OnBoundary(y + pheight, x + pwidth)) return true;
+
+	return false;
+}
+
+
+// Counts amount of the element in an array
+int Map::ObjCount(int ** ARR, const int obj) { 
+	int count = 0;
+	for (int y = 0; y < height + 2; y++) {
+		for (int x = 0; x < width + 2; x++) {
+			if (ARR[y][x] == obj) {
+				++count;
+			}	
+		}
+	}
+
+	return count;
+}
+
 
