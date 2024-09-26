@@ -42,7 +42,7 @@ void Map::InitMines() {
 			       	int deleted = 0;	
 				deleteBlockingMines(&visitedSpaces, &deleted);
 				spaces+=deleted;
-				total_mines-=placed;
+				total_mines-=deleted;
 
 				resetPATH(PATH, &visitedSpaces);
 				floodFill(SPAWNY, SPAWNX, PATH, &visitedSpaces);
@@ -50,15 +50,6 @@ void Map::InitMines() {
 
 		}	
 	}
-	
-	
-	Message("\nMINES ON MAP: " + std::to_string(ObjCount(arrMap, MINE)) + 
-		"\n\nMINES: " + std::to_string(mines) +
-		"\nTOTAL MINES: " + std::to_string(total_mines) +
-		"\nVISITED: " + std::to_string(visitedSpaces) +
-		"\nSPACES: " + std::to_string(spaces) +
-		"\n");
-
 }
 
 void Map::deleteBlockingMines(int * visitedSpaces, int * deleted) {
