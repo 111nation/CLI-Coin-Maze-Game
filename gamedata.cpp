@@ -12,6 +12,13 @@ Map::Map(int x, int y) {
 		ycurs = -1;
 		xcurs = -1; 
 		
+		// Calculates PLAYER HEALTH
+		Player.health = 3;
+
+
+		// Initializes status bar
+		Status();
+
 		MapGen(); // Generates map
 		DrawNew();
 
@@ -20,7 +27,7 @@ Map::Map(int x, int y) {
 				throw "Cursor failure";
 		}
 
-		hideCurs();	
+		//hideCurs();	
 }
 
 Map::~Map () {
@@ -105,83 +112,12 @@ void Map::MapGen(){
 
 }
 
-//=======================
-// CURSER CONTROLS
-//=======================
-
-void Map::CursReturn() {
-		// Returns curser to beginning
-		std::cout << '\r' << ESC << height+2 << UP;
-		ycurs = -1;
-		xcurs = -1;	
-}
-
-void Map::CursPlayer() {
-		// Returns curser to player
-	
-		std::cout << '\r' << ESC << ycurs+1 << UP;
-		std::cout << ESC << Player.y+1 << DOWN;
-
-		std::cout << ESC << Player.x+1 << RIGHT;
-
-		xcurs = Player.x;
-		ycurs = Player.y;
-}
-
-void Map::hideCurs() { 
-		CursorProp.bVisible = false;
-		
-		if (!SetConsoleCursorInfo(hConsoleWindow, &CursorProp)) {
-				throw "Cursor failure";
-		}
-}
-
-void Map::showCurs() {
-		CursorProp.bVisible = true;
-
-		if (!SetConsoleCursorInfo(hConsoleWindow, &CursorProp)) {
-				throw "Cursor failure";
-		}
-
-}
-
-void Map::CursBottom() {
-	CursTop();
-	std::cout << ESC << height + 2 << DOWN;
-	ycurs = height + 1;
-}
-
-void Map::CursTop() {
-	std::cout << ESC << ycurs + 1 << UP;
-	ycurs = -1;
-}
-
-void Map::MovCurs(int x, int y) {
-		// Y Movement
-		if (y != 0) {
-			if (y > 0) {
-				std::cout << ESC << y << DOWN;
-			} else {
-				std::cout << ESC << -y << UP;
-			}
-		}
-
-		// X Movement
-		if (x != 0) {
-			if (x > 0) {
-				std::cout << ESC << x << RIGHT;
-			} else {
-				std::cout << ESC << -x << LEFT;
-			}
-		}
-		
-}
-
 //=======================	
 // UPDATING SCREEN
 //=======================
 void Map::DrawNew() {
 		CursReturn();
+		std::wcout << ESC << status_lines << DOWN;
 		
 		for (ycurs = -1; ycurs <= height; ycurs++) { 
 			for (xcurs = -1; xcurs <= width; xcurs++) {
@@ -191,56 +127,6 @@ void Map::DrawNew() {
 		}	
 
 		CursPlayer();
-}
-
-void Map::Message(std::string msg) { 
-		// CURSER PLACEMENT
-		int oldy = ycurs;
-		int oldx = xcurs;
-		
-
-		//==========================
-		// MESSAGE HANDLING
-		//==========================
-		// COUNTS MESSAGE LINES
-		int newMsg_lines = 0;
-		for (unsigned int i = 0; i < msg.length(); i++) {
-			if (msg[i] == '\n') {
-				++newMsg_lines;
-			}
-		}
-		
-		CursBottom();
-
-		// CLEARS PREV MESSAGE
-		if (msg_lines > 0) {
-			std::cout << '\r';
-
-			MovCurs(0,msg_lines);
-			for (int i = msg_lines; i > 0; i--) {
-				std::cout << ESC << "2K";
-			}		
-			MovCurs(0,-msg_lines); 	
-		}
-		
-		// DISPLAY MESSAGE
-		msg_lines = newMsg_lines;
-		std::cout << '\r'<< msg;
-
-		//==========================
-		// CURSER HANDLING
-		//==========================
-		// UPDATES CURSER POS
-		std::cout << '\r';
-		xcurs = -1;
-		ycurs = ((height + 2) + msg_lines) - 1;
-		
-		// BACK TO TOP
-		CursTop(); 
-		
-		MovCurs(oldx+1, oldy+1);
-		ycurs = oldy;
-		xcurs = oldx;
 }
 
 wchar_t Map::getChar(int y, int x) {
@@ -285,9 +171,11 @@ void Map::Move(int x, int y) {
 		// Checks what object player landed on
 		int objLanded = arrMap[newy + 1][newx + 1];
 		switch (objLanded) {
-
-			case DOOR:
+			
 			case MINE:
+				--Player.health;
+				Status();
+			case DOOR:
 			case SPACE:
 				arrMap[newy + 1][newx + 1] = PLAYER;
 				moved = true;
