@@ -136,7 +136,6 @@ void Map::DoorGen() {
 	resetPATH(PATH, &visitedSpaces);	
 	floodFill(SPAWNY, SPAWNX, PATH, &visitedSpaces);
 	
-	std::cerr << arrMap[1][1];
 	while (visitedSpaces < spaces) {
 		bool doorAdded = false;
 		for (int y = 1; y < height+1; y++) {
@@ -398,6 +397,5 @@ bool Map::RoomGen() {
 	}
 
 	DoorGen();
-	std::cout << "DOOR GEN DIDNT CAUSE CRASH";	
 	return false; // Rooms didnt finish generating	
 }

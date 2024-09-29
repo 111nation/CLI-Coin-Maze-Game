@@ -9,7 +9,9 @@ bool gameLoop (Map map);
 
 int main () {
 	system("cls");
-	std::setlocale(LC_ALL, ""); // Enables UTF-8 by setting language settings to all
+
+	std::setlocale(LC_ALL, "");  // Explicitly set to UTF-8 locale
+
 	// Initializes MAP
 	Map *map=nullptr;
 	try {
@@ -19,6 +21,7 @@ int main () {
 			// User quits game
 			map->CursBottom();
 			map->showCurs();
+			delete[] map;
 			return 0;
 		}
 
@@ -27,6 +30,7 @@ int main () {
 		// ERROR HANDLING
 		//=======================
 		std::cerr << err << std::endl;
+		delete[] map;
 	}
 
 }

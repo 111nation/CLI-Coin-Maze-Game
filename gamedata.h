@@ -18,6 +18,9 @@
 #define LEFT 'D'
 #define RIGHT 'C'
 
+// CURSER TOOLS
+#define CLEAR_LINE "2K"
+
 //=======================
 // ARRAY MAP DATA
 //=======================
@@ -48,13 +51,18 @@
 #define SPAWNX 1
 #define SPAWNY 1
 
+//=======================
+// STATUS BAR DATA
+//=======================
+#define STATUS_MARGIN 
 
 class Player {
 	public: 
-	int x, y; 
+	int x, y, health; 
 	Player() { 
 		x = 0;
 		y = 0;
+		health = 0;
 	}
 };
 
@@ -75,6 +83,11 @@ class Map {
 	int** arrRoom;
 	// PATHFINDING
 	int** PATH = new int * [height+2];
+
+    	//=======================
+    	// MAP DISPLAY
+    	//=======================
+	const wchar_t heart[5] = L" <3 "; 
 
     	//=======================
     	// MAP DISPLAY
@@ -161,16 +174,24 @@ class Map {
     	//=======================
 	void DrawNew();
 	
-	// MESSAGE (BOTTOM)
-	int msg_lines = 0;
-	void Message(std::string msg);
-	void ClearMessage();
-    	
 	//=======================
 	// PLAYER MOVEMENT
     	//=======================
 	void Move(int x, int y);
 	void pickCoin();
+
+	//=======================
+	// GAME OUTPUT TO PLAYER
+	//=======================
+	// MESSAGE (BOTTOM)
+	int msg_lines = 0;
+	void Message(std::string msg);
+	void ClearMessage();
+	// STATUS BAR (TOP)
+	int status_lines = 0;
+	int status_height = 0;
+	void Status();
+	void ClearStatus();
 
 	//=======================
 	// UTILITIES
