@@ -21,7 +21,9 @@
 // CURSER TOOLS
 #define CLEAR_LINE "2K"
 
-#define EXIT 0
+//=======================
+// GAME STATUS
+//=======================
 #define LOST 1
 #define WIN 2
 #define GAME_ERROR 3
@@ -59,7 +61,7 @@
 //=======================
 // STATUS BAR DATA
 //=======================
-#define STATUS_LINES 1
+#define STATUS_LINES 3
 
 class Player {
 	public: 
@@ -190,13 +192,13 @@ class Map {
 	//=======================
 	// MESSAGE (BOTTOM)
 	int msg_lines = 0;
-	void Message(std::string msg);
+	void Message(std::wstring msg);
 	void ClearMessage();
 	// STATUS BAR (TOP)
 	int status_lines = 0;
-	int status_height = 0;
 	void Status();
 	void ClearStatus();
+	void CursStatus();
 
 	//=======================
 	// UTILITIES

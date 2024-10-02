@@ -17,11 +17,8 @@ Map::Map(int x, int y) {
 		// Calculates PLAYER HEALTH
 		Player.health = 5;
 
-
-		// Initializes status bar
-		Status();
-
 		MapGen(); // Generates map
+		Status();
 		DrawNew();
 
 		// Initiializes curser properties
@@ -111,24 +108,6 @@ void Map::MapGen(){
 	arrMap[Player.y + 1][Player.x + 1]=PLAYER;
 	ycurs = 0;
 	xcurs = 0;
-
-}
-
-//=======================	
-// UPDATING SCREEN
-//=======================
-void Map::DrawNew() {
-		CursReturn();
-		std::wcout << ESC << status_lines << DOWN;
-		
-		for (ycurs = -1; ycurs <= height; ycurs++) { 
-			for (xcurs = -1; xcurs <= width; xcurs++) {
-				std::wcout << getChar(ycurs + 1, xcurs + 1); 
-			}
-			std::wcout<<'\n';
-		}	
-
-		CursPlayer();
 }
 
 wchar_t Map::getChar(int y, int x) {
@@ -177,7 +156,6 @@ void Map::Move(int x, int y) {
 			case MINE:
 				arrMap[newy + 1][newx + 1] = PLAYER;
 				moved = true;
-				Status();
 			case DOOR:
 			case SPACE:
 				arrMap[newy + 1][newx + 1] = PLAYER;
@@ -216,9 +194,11 @@ void Map::Move(int x, int y) {
 			switch (objLanded) {
 				case COIN:
 					pickCoin();
+					Status();
 					break;
 				case MINE:
 					steppedOnMine();
+					Status();
 					break;
 			}
 		}

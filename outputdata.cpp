@@ -1,4 +1,5 @@
 #include "gamedata.h"
+#include <sstream>
 
 void Map::Status() {
 	
@@ -6,20 +7,34 @@ void Map::Status() {
 	int oldy = ycurs;
 	int oldx = xcurs;
 
-	CursReturn(); // Move to top
-	std::wcout << ESC << status_lines << UP;
+	CursTop();
 	std::wcout << '\r';
-	//std::wcout << ESC << CLEAR_LINE;
 
 	ClearStatus();
-
+	
+	std::wstringstream wss;
+	
 	// ACTUAL MESSAGE
-	std::cout << "HEALTH:\t";
+	wss << L"HEALTH:\t";
 	for (int i=1; i <= Player.health; i++) {
-		std::wcout << heart;
+		wss << heart;
 	}
-
+		
+	wss << L"\nCOINS:\t";
+	wss << coinsLeft;
+	std::wstring msg = wss.str();
+	std::wcout << msg;
+	wss.str(L"");
+	
+	// COUNTS MESSAGE LINES
 	status_lines = 1;
+	for (unsigned int i = 0; i < msg.length(); i++) {
+		if (msg[i] == '\n') {
+			++status_lines;
+		}
+	}
+	++status_lines;
+	CursTop();
 	
 	//==========================
 	// CURSER HANDLING
@@ -36,18 +51,18 @@ void Map::Status() {
 }
 
 void Map::ClearStatus() {
-	CursReturn();
+	CursStatus();
 
 	if (status_lines <= 0) return;
 
 	std::cout << '\r';
 
-	for (int line=1; line <= status_lines; line++) {
+	for (int line=0; line < status_lines; line++) {
 		std::wcout << ESC << CLEAR_LINE;
-		std::wcout << ESC << line << DOWN;
+		std::wcout << ESC << DOWN;
 	}
 	
-	CursReturn();
+	CursStatus();
 	status_lines = 0;
 }
 
@@ -72,7 +87,7 @@ void Map::ClearMessage() {
 		msg_lines = 0;
 }
 
-void Map::Message(std::string msg) { 
+void Map::Message(std::wstring msg) { 
 		// CURSER PLACEMENT
 		int oldy = ycurs;
 		int oldx = xcurs;
@@ -93,7 +108,7 @@ void Map::Message(std::string msg) {
 
 		// DISPLAY MESSAGE
 		msg_lines = newMsg_lines;
-		std::cout << '\r'<< msg;
+		std::wcout << '\r'<< msg;
 
 		//==========================
 		// CURSER HANDLING
@@ -117,6 +132,11 @@ void Map::Message(std::string msg) {
 //=======================
 // CURSER CONTROLS
 //=======================
+void Map::CursStatus() {
+	CursReturn();
+	if (status_lines <= 0) return;
+	std::cout << ESC << status_lines << UP;
+}
 
 void Map::CursReturn() {
 		// Returns curser to beginning
@@ -182,7 +202,25 @@ void Map::MovCurs(int x, int y) {
 			} else {
 				std::wcout << ESC << -x << LEFT;
 			}
-		}
-		
+		}		
 }
+
+//=======================	
+// UPDATING SCREEN
+//=======================
+void Map::DrawNew() {
+		CursReturn();
+		std::wcout << ESC << status_lines << DOWN;
+		
+		for (ycurs = -1; ycurs <= height; ycurs++) { 
+			for (xcurs = -1; xcurs <= width; xcurs++) {
+				std::wcout << getChar(ycurs + 1, xcurs + 1); 
+			}
+			std::wcout<<'\n';
+		}	
+
+		CursPlayer();
+}
+
+
 
