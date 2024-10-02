@@ -21,8 +21,13 @@
 // CURSER TOOLS
 #define CLEAR_LINE "2K"
 
-//=======================
-// ARRAY MAP DATA
+#define EXIT 0
+#define LOST 1
+#define WIN 2
+#define GAME_ERROR 3
+#define PLAYING 4
+
+// ARRY MAP DATA
 //=======================
 #define VWALL 0
 #define HWALL 1
@@ -54,7 +59,7 @@
 //=======================
 // STATUS BAR DATA
 //=======================
-#define STATUS_MARGIN 
+#define STATUS_LINES 1
 
 class Player {
 	public: 
@@ -115,7 +120,6 @@ class Map {
 	CONSOLE_CURSOR_INFO CursorProp = {}; // Stores properties of cursor (Visibility and Size)
 
 	public:
-    
 	Map(int x, int y);
     	~Map();
 
@@ -125,6 +129,7 @@ class Map {
 	void InitMines();
 	void placeMines(int amount_of_mines, int * placed_mines);
 	void deleteBlockingMines(int * visitedSpaces, int * deleted);
+	void steppedOnMine();
 
     	//=======================
     	// ROOMS
@@ -206,4 +211,11 @@ class Map {
 
 	int ObjCount(int ** ARR, const int obj);
 	bool isBlocking(int y, int x, int ** PATH);
+
+	//=======================
+	// GAME CONTROLS
+	//=======================
+	int game_status;
+	void GameOver();
+	void Win();
 };

@@ -154,4 +154,11 @@ void Map::placeMines(int amount_of_mines, int * placed_mines) {
 		}
 	}
 }
-
+void Map::steppedOnMine () {
+	--mines;
+	--Player.health;
+	if (Player.health <= 0) {
+		// Game Over
+		GameOver();
+	}
+}

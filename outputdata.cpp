@@ -6,9 +6,6 @@ void Map::Status() {
 	int oldy = ycurs;
 	int oldx = xcurs;
 
-	// DISPLAYS PLAYER STATUS AT STATUS BAR
-	if (Player.health < 0) throw "Health cannot be a negative value!";
-
 	CursReturn(); // Move to top
 	std::wcout << ESC << status_lines << UP;
 	std::wcout << '\r';

@@ -49,6 +49,9 @@ bool Map::CoinGen() {
 
 void Map::pickCoin() {
 	--coinsLeft;
+	if (coinsLeft<= 0) {
+		Win();
+	}
 	
-	//Message("Coins: " + std::to_string(coins) + "\nCoins Left: " + std::to_string(coinsLeft));
+//	Message("Coins: " + std::to_string(coins) + "\nCoins Left: " + std::to_string(coinsLeft));
 }

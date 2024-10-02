@@ -1,6 +1,8 @@
 #include "gamedata.h"
 
 Map::Map(int x, int y) {
+		game_status = PLAYING;
+
 		width = x;
 		height = y;
 		if ((width < 5) || (height < 5)) {
@@ -13,7 +15,7 @@ Map::Map(int x, int y) {
 		xcurs = -1; 
 		
 		// Calculates PLAYER HEALTH
-		Player.health = 3;
+		Player.health = 5;
 
 
 		// Initializes status bar
@@ -27,7 +29,7 @@ Map::Map(int x, int y) {
 				throw "Cursor failure";
 		}
 
-		//hideCurs();	
+		hideCurs();	
 }
 
 Map::~Map () {
@@ -173,7 +175,8 @@ void Map::Move(int x, int y) {
 		switch (objLanded) {
 			
 			case MINE:
-				--Player.health;
+				arrMap[newy + 1][newx + 1] = PLAYER;
+				moved = true;
 				Status();
 			case DOOR:
 			case SPACE:
@@ -213,6 +216,9 @@ void Map::Move(int x, int y) {
 			switch (objLanded) {
 				case COIN:
 					pickCoin();
+					break;
+				case MINE:
+					steppedOnMine();
 					break;
 			}
 		}
@@ -269,3 +275,13 @@ int Map::ObjCount(int ** ARR, const int obj) {
 }
 
 
+//===========================
+// GAME CONTROLS
+//===========================
+void Map::GameOver() {
+	game_status = LOST;	
+}
+
+void Map::Win() {
+	game_status = WIN;
+}
