@@ -4,6 +4,7 @@
 int main () {
 	system("cls");
 
+	SetConsoleOutputCP(CP_UTF8);
 	std::setlocale(LC_ALL, "");  // Explicitly set to UTF-8 locale
 	
 	// Initialize game
