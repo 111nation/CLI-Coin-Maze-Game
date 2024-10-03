@@ -5,9 +5,9 @@ Map::Map(int x, int y) {
 
 		width = x;
 		height = y;
-		if ((width < 5) || (height < 5)) {
+		if ((width < MIN_WIDTH) || (height < MIN_HEIGHT)) {
 			throw "Map too small";
-		} else if ((width > 100) || (height > 25)) {
+		} else if ((width > MAX_WIDTH) || (height > MAX_HEIGHT)) {
 			throw "Map too big";
 		}
 	

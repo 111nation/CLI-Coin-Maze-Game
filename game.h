@@ -26,9 +26,11 @@ class Game {
 	
 	int level=0;
 	Game(int lvl) {
+		if (lvl <= 0) throw "Level invalid!";
+
 		level = lvl;
 		try {
-			map = new Map(25, 10);	
+			map = new Map(Width(), Height());	
 		} catch (const char error) {
 			delete [] map;
 			throw "Failed to initialize game: " + error;
@@ -36,12 +38,39 @@ class Game {
 	}
 
 	~Game() {
-		delete [] map;
+		delete map;
 	}
 
 	//==================
 	// GAME MECHANICS
 	//==================
+	int Width() {
+		// Determines the width of the room
+		int width = rand() % (MAX_WIDTH - MIN_WIDTH + 1) + MAX_WIDTH;
+		width = std::round(width * (0.05 * level));
+		
+		if (width < MIN_WIDTH) {
+			width = MIN_WIDTH;
+		} else if (width > MAX_WIDTH) {
+			width = MAX_WIDTH;
+		}
+
+		return width;
+	}
+
+	int Height() {
+		// Determines the height of the room
+		int height = rand() % (MAX_HEIGHT - MIN_HEIGHT + 1) + MAX_HEIGHT;	
+		height = std::round(height * (0.2 * level));
+
+		if (height < MIN_HEIGHT) {
+			height = MIN_HEIGHT;
+		} else if (height > MAX_HEIGHT) {
+			height = MAX_HEIGHT;
+		}
+
+		return height;
+	}
 	
 	void Message(std::wstring in) {
 		map->Message(in);
@@ -123,7 +152,7 @@ void UpdateGame(const int status, std::wstring * message, int *level) {
 			break;
 		case LOST:
 			*message = L"Better luck next time!\nTry not, well...\n...die?";
-			if (level-1 > 0) { 
+			if (*level-1 > 0) { 
 				--(*level);
 			}
 			break;
@@ -146,7 +175,8 @@ void Dialogue(std::wstring msg, const int WAIT, const bool erase) {
 
 	// Erases Message
 	for (unsigned int i=msg.length()-1; i >= 0; i--) {
-		if (msg[i] == '\n') {
+		std::wcout << "\b \b";
+		if (msg[i-1] == '\n') {
 			std::wcout << ESC << UP;
 		}
 		std::wcout << "\b \b";

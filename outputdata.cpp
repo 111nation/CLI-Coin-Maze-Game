@@ -50,6 +50,8 @@ void Map::Status() {
 	xcurs = oldx;
 }
 
+void Colour(); 
+
 void Map::ClearStatus() {
 	CursStatus();
 

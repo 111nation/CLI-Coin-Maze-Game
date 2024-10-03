@@ -29,6 +29,7 @@
 #define GAME_ERROR 3
 #define PLAYING 4
 
+//=======================
 // ARRY MAP DATA
 //=======================
 #define VWALL 0
@@ -38,6 +39,11 @@
 #define SPACE 4
 #define DOOR 5
 #define MINE 6
+
+#define MIN_WIDTH 5
+#define MAX_WIDTH 100
+#define MIN_HEIGHT 5
+#define MAX_HEIGHT 20
 
 //=======================
 // ARRAY ROOM DATA

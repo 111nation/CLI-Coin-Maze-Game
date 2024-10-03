@@ -7,6 +7,8 @@ int main () {
 	std::setlocale(LC_ALL, "");  // Explicitly set to UTF-8 locale
 	
 	// Initialize game
+	Game *game=nullptr;
+	// Initialize game
 	// INTRO
 	std::wstringstream wss;
 	wss << L"You, Player, have heard that in a faraway island lay treasure...\n"
@@ -37,8 +39,8 @@ int main () {
 		Dialogue(wss.str(), LEVEL_WAIT, false);
 		wss.str(L"");
 		system("cls");
-				
-		Game *game=nullptr;
+		
+		game = nullptr;		
 		try {
 			game = new Game(level);
 			// Game Loop
@@ -52,6 +54,7 @@ int main () {
 			system("cls");
 
 			UpdateGame(game->getStatus(), &msg, &level);
+			Sleep(LEVEL_WAIT / 2);
 			Dialogue(msg, GAME_WAIT, false);
 		} catch (const char * error[]) {
 			wss.str(L"");
@@ -59,8 +62,7 @@ int main () {
 			Dialogue(wss.str(), GAME_WAIT, false);
 			wss.str(L"");
 		}
-		game->~Game();
-		delete [] game;
+		delete game;
 	}
 
 	return 0;	
