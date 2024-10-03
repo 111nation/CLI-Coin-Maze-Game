@@ -15,16 +15,19 @@ void Map::Status() {
 	std::wstringstream wss;
 	
 	// ACTUAL MESSAGE
-	wss << L"HEALTH:\t";
+	wss << L"HEALTH:   ";
+	//console.Colour(BLACK_TEXT, WHITE_BG);
 	for (int i=1; i <= Player.health; i++) {
 		wss << heart;
 	}
 		
-	wss << L"\nCOINS:\t";
+	wss << L"\nCOINS:   ";
 	wss << coinsLeft;
 	std::wstring msg = wss.str();
+	//console.Colour(BLACK_TEXT, WHITE_BG);
 	std::wcout << msg;
 	wss.str(L"");
+	//console.ResetColour();
 	
 	// COUNTS MESSAGE LINES
 	status_lines = 1;
@@ -49,8 +52,6 @@ void Map::Status() {
 	ycurs = oldy;
 	xcurs = oldx;
 }
-
-void Colour(); 
 
 void Map::ClearStatus() {
 	CursStatus();
@@ -216,7 +217,10 @@ void Map::DrawNew() {
 		
 		for (ycurs = -1; ycurs <= height; ycurs++) { 
 			for (xcurs = -1; xcurs <= width; xcurs++) {
+				int obj = getObject(ycurs + 1, xcurs + 1);
+				console.Colour(getFgColour(obj), 0);
 				std::wcout << getChar(ycurs + 1, xcurs + 1); 
+				console.ResetColour();
 			}
 			std::wcout<<'\n';
 		}	
@@ -224,5 +228,24 @@ void Map::DrawNew() {
 		CursPlayer();
 }
 
+//=======================	
+// COLOURING
+//=======================
+int Map::getFgColour(int obj) {
+	switch (obj) {
+		case PLAYER: 
+			return WHITE_TEXT;
+		case COIN:
+			return RED_TEXT | GREEN_TEXT;
+		case HWALL:
+		case VWALL:
+			return WHITE_TEXT;
+		case MINE: 
+			return RED_TEXT;
 
+		default: 
+			return WHITE_TEXT;
+	}
+
+}
 

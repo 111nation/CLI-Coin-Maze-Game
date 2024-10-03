@@ -19,11 +19,12 @@ void Console::CursPos() {
 }	
 
 void Console::Colour(int fgcolour, int bgcolour) {
-	CursPos();
+	//CursPos();
 	// Set the text color attributes
 	SetConsoleTextAttribute(hConsole, fgcolour | bgcolour);
 }
 
 void Console::ResetColour() {
+	
 	SetConsoleTextAttribute(hConsole, csbi.wAttributes);
 }

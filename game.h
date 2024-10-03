@@ -12,7 +12,7 @@
 
 #define KEY_WAIT 50
 #define ERASE_WAIT 5
-#define CHAR_WAIT 50
+#define CHAR_WAIT 40
 #define GAME_WAIT 2000
 #define LEVEL_WAIT 1500
 
@@ -147,11 +147,11 @@ void Quit(Game *game) {
 void UpdateGame(const int status, std::wstring * message, int *level) {
 	switch (status) {
 		case WIN:
-			*message = L"Good job player!\nIt only get's...\nharder... from here!";
+			*message = L"I survived only this room...\nIt only gets...\nharder...\nfrom here...";
 			++(*level); // Add a level
 			break;
 		case LOST:
-			*message = L"Better luck next time!\nTry not, well...\n...die?";
+			*message = L"Ouch!\nI should try not, well...\n...\nstep on mines?\nLet's do this again...";
 			if (*level-1 > 0) { 
 				--(*level);
 			}
@@ -164,7 +164,7 @@ void Dialogue(std::wstring msg, const int WAIT, const bool erase) {
 	for (unsigned int i=0; i < msg.length(); i++) {
 		std::wcout << msg[i];
 		if (msg[i] == '.' || msg[i] == '\n'){
-			Sleep(CHAR_WAIT*2);
+			Sleep(CHAR_WAIT*4);
 		} else {
 			Sleep(CHAR_WAIT);
 		}
@@ -174,11 +174,7 @@ void Dialogue(std::wstring msg, const int WAIT, const bool erase) {
 	if (erase == false) return;
 
 	// Erases Message
-	for (unsigned int i=msg.length()-1; i >= 0; i--) {
-		std::wcout << "\b \b";
-		if (msg[i-1] == '\n') {
-			std::wcout << ESC << UP;
-		}
+	for (unsigned int i=msg.length(); i > 0; i--) {
 		std::wcout << "\b \b";
 		Sleep(ERASE_WAIT);
 	}

@@ -7,6 +7,8 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+#include "display.h"
+
 //=======================
 // CURSER DATA
 //=======================
@@ -126,6 +128,7 @@ class Map {
 	//CURSER DETAILS
 	HANDLE hConsoleWindow = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO CursorProp = {}; // Stores properties of cursor (Visibility and Size)
+	Console console;
 
 	public:
 	Map(int x, int y);
@@ -205,6 +208,11 @@ class Map {
 	void Status();
 	void ClearStatus();
 	void CursStatus();
+
+	//=======================
+	// COLOURING
+	//=======================
+	int getFgColour(int obj);	
 
 	//=======================
 	// UTILITIES

@@ -40,6 +40,8 @@ Map::~Map () {
     delete [] PATH;
     delete [] arrMap;
     delete [] arrRoom;
+
+    showCurs();
 }
 
 //=======================
@@ -185,12 +187,14 @@ void Map::Move(int x, int y) {
 			MovCurs(Player.x - xcurs, Player.y - ycurs);
 
 			arrMap[newy + 1][newx + 1] = PLAYER;
+			console.Colour(getFgColour(PLAYER), 0);
 			std::wcout << cplayer << '\b';
+			console.ResetColour();
 			// Update curser
 			ycurs = Player.y;
 			xcurs = Player.x;
 			
-			// Determins what to do when user lands on certain object
+			// Determines what to do when user lands on certain object
 			switch (objLanded) {
 				case COIN:
 					pickCoin();
