@@ -8,6 +8,8 @@ Version 1
 <br />
 <br />
 
+https://github.com/user-attachments/assets/7e2f3717-e277-489f-8220-e7551dca6ab9
+
 <div align='center'>
   <img src='https://github.com/user-attachments/assets/b577f694-ac28-42f5-8d3a-73cec8fefc10' align='center' width='50%'/>
 </div>
@@ -40,7 +42,8 @@ The goal of this game is to collect as many coins as possible
 
 <div align='center'>
   <img src='https://github.com/user-attachments/assets/6259b645-eca2-4ebb-bcdc-72ad409c3ce7' align='center' width='45%'/>
-  <image src='https://github.com/user-attachments/assets/6d92455f-3b53-4267-b1a8-ea7ef82c5331' align='center' width='45%'/>
+  <img src='https://github.com/user-attachments/assets/6d92455f-3b53-4267-b1a8-ea7ef82c5331' align='center' width='45%'/>
+  <img src='https://github.com/user-attachments/assets/644238ae-a431-46f4-a60d-3af6b6b3a3f6' align='center' width='45%'/>
 </div>
 
 
